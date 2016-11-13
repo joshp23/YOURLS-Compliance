@@ -1,4 +1,4 @@
-# Complaince for YOURLS
+# Compliance for YOURLS
 An anti-abuse plugin written for and tested with YOURLS 1.7.1
 
 By Josh Panter [Unfettered](https://unfettered.net). See it in action at [0=2](https://0eq2.com/) - An Unfettered URL Shortening Service
