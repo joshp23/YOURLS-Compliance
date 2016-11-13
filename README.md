@@ -30,6 +30,7 @@ NOTE: The sql table may need to be added manually using compliance.sql located i
 1. Flagged links to be sanitized against known blacklists and deleted. This is not a part of the current release, as other plugins can check blacklists before link submission.
 2. Project Honeypot may be implimented in order to prevent known abusers access.
 3. Add option to keep tables on deactivation in config file.
+4. Cause flagged URLS to be colour-coded in main admin interface.
 
 ### CREDITS
 Scripts used for inspiration and/or copypasta:
