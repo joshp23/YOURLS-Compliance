@@ -1,0 +1,6 @@
+<?php
+// Compliance plugin for Yourls - URL Shortener ~ Settings 
+// Copyright (c) 2016, Josh Panter <joshu@unfettered.net>
+
+// Define a custom compliance redirect here
+// define( 'YOURLS_COMPLIANCE_REDIRECT', 'http://example.com' );
