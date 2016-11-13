@@ -34,6 +34,7 @@ Notification page and abuse report pages are both written with Bootstrap.
 ### TODO:
 1. Add option to keep tables on deactivation in config file.
 2. Cause flagged URLS to be colour-coded in main admin interface.
+3. Move to uniform pdo
 
 ### CREDITS
 Scripts used for inspiration and/or copypasta:
