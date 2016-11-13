@@ -1,7 +1,7 @@
 # Complaince for YOURLS
 An anti-abuse plugin written for and tested with YOURLS 1.7.1
 
-By Josh Panter [Unfettered] (https://unfettered.net)
+By Josh Panter [Unfettered](https://unfettered.net). See it in action at [0=2 - An Unfettered URL Shortening Service](https://0eq2.com/)
 
 Compliance is designed to address link complaints from 3rd parties. Compliance implements a flag-list which can be updated via the admin interface or an optional public report-page. This allows any visitor to complain about an abusive URL. The URL is flagged and future visitors are warned and given the option to avoid the link.
 
