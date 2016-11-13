@@ -20,17 +20,20 @@ Notification page and abuse report pages are both written with Bootstrap.
 4. Link abuse.php to the pages/ directory. From YOURLS base directory:
 
 	```bash
-  $ ln -s ./user/plugins/compliance/abuse.php ./pages/abuse.php
+  $ ln -s ./user/plugins/YOURLS-Compliance/abuse.php ./pages/abuse.php
   ```
 
-NOTE: The sql table may need to be added manually using compliance.sql located in assets/. When disabling the plugin, tables will be dropped. 
+#### NOTE: The sql table may need to be added manually using compliance.sql located in assets/. 
 
-### TODO: 
+#### CAUTION: When disabling the plugin, tables will be dropped, currently the plugin.php file can be edited to rpevent this.
 
-1. Flagged links to be sanitized against known blacklists and deleted. This is not a part of the current release, as other plugins can check blacklists before link submission.
-2. Project Honeypot may be implimented in order to prevent known abusers access.
-3. Add option to keep tables on deactivation in config file.
-4. Cause flagged URLS to be colour-coded in main admin interface.
+### WON'T DO: 
+1. Flagged links need to be sanitized against known blacklists (ex: GSB, etc.) and deleted. This is not a part of the current release, as other plugins can check blacklists before link submission. It is highly reccomended that one of these be used. One job for one program... no monoliths.
+2. Project Honeypot can be implimented in order to prevent known abusers access. This also needs to be it's own entity.
+
+### TODO:
+1. Add option to keep tables on deactivation in config file.
+2. Cause flagged URLS to be colour-coded in main admin interface.
 
 ### CREDITS
 Scripts used for inspiration and/or copypasta:
