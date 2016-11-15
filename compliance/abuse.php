@@ -8,7 +8,7 @@ global $ydb;
   	
     <meta charset="utf-8">
     <title>Compliance Report</title>
-
+	  
     <!-- Bootstrap core CSS -- USE LOCAL CACHE
    <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/spacelab/bootstrap.min.css" rel="stylesheet" integrity="sha384-L/tgI3wSsbb3f/nW9V6Yqlaw3Gj7mpE56LWrhew/c8MIhAYWZ/FNirA64AVkB5pI" crossorigin="anonymous"> -->
 
@@ -32,15 +32,15 @@ global $ydb;
 
 	<?php
 	$alias = "";
-	$reporttext = "";
-	$reportemail = "";
+	$report = "";
+	$contact = "";
 	if(isset($_POST['alias'])) $alias=mysql_escape_string($_POST['alias']);
-	if(isset($_POST['report'])) $reporttext=mysql_escape_string($_POST['report']);
-	if(isset($_POST['contact'])) $reportemail=mysql_escape_string($_POST['contact']);
+	if(isset($_POST['report'])) $report=mysql_escape_string($_POST['report']);
+	if(isset($_POST['contact'])) $contact=mysql_escape_string($_POST['contact']);
 
 	if (!empty($alias)) {
 	    $table = "flagged";
-	    $insert = $ydb->query("REPLACE INTO `$table` (keyword, reason, addr) VALUES ('$alias', '$reporttext', '$reportemail')");
+	    $insert = $ydb->query("REPLACE INTO `$table` (keyword, reason, addr) VALUES ('$alias', '$report', '$contact')");
 	    echo "
 		<div class='alert alert-dismissible alert-success'>
 			<strong>Success</strong> <b>http://$_SERVER[HTTP_HOST]/$alias</b> has been flagged. <a href='https://$_SERVER[HTTP_HOST]'>Click here</a> to return to the main page.
@@ -48,7 +48,7 @@ global $ydb;
 			}
 	?>
 
-	<form class="form-horizontal" method="post" action="report">
+	<form class="form-horizontal" method="post" action="">
 	<fieldset>
 
 		<div class="form-group">
@@ -61,7 +61,7 @@ global $ydb;
 		<div class="form-group">
 		<label for="report" class="col-lg-2 control-label">Reason for report</label>
 			<div class="col-lg-10">
-				<textarea class="form-control" rows="3" id="report" name="report"><?php echo $reporttext ?></textarea>
+				<textarea class="form-control" rows="3" id="report" name="report"><?php echo $report ?></textarea>
 			<span class="help-block">Please give us some details about this problem.</span>
 			</div>
 		</div>
@@ -69,7 +69,7 @@ global $ydb;
 		<div class="form-group">
 		<label for="contact" class="col-lg-2 control-label">Email</label>
 			<div class="col-lg-10">
-				<input type="text" class="form-control" id="contact" name="contact" placeholder="Email (kept private)" style="background-repeat: repeat; background-image: none; background-position: 0% 0%;" value="<?php echo $reportemail ?>">
+				<input type="text" class="form-control" id="contact" name="contact" placeholder="Email (kept private)" style="background-repeat: repeat; background-image: none; background-position: 0% 0%;" value="<?php echo $contact ?>">
 			</div>
 		</div>
 
