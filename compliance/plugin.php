@@ -13,7 +13,7 @@ Author URI: https://unfettered.net
 // No direct call
 if( !defined( 'YOURLS_ABSPATH' ) ) die();
 
-// Check for config file - currently this file is mostly a placeholder for future features
+// Check for config file - currently this file is mostly a placeholder
 if (!file_exists(dirname(__FILE__)."/config.php")) {
 	echo "You need to configure the Compliance config.php file. Please check the README.";
 	die;
@@ -22,7 +22,7 @@ if (!file_exists(dirname(__FILE__)."/config.php")) {
 require_once("config.php");
 
 // Create tables for this plugin when activated
-yourls_add_action( 'activated_YOURLS-Compliance/plugin.php', 'compliance_activated' );
+yourls_add_action( 'activated_compliance/plugin.php', 'compliance_activated' );
 function compliance_activated() {
 
 	global $ydb;
@@ -198,6 +198,7 @@ function display_flagpage($keyword, $reason) {
         $url   = yourls_get_keyword_longurl( $keyword );
         $base  = YOURLS_SITE;
 	$img   = yourls_plugin_url( dirname( __FILE__ ).'/assets/caution.png' );
+	$css   = yourls_plugin_url( dirname( __FILE__ ).'/assets/caution.png' );
 
 	$vars = array();
 		$vars['keyword'] = $keyword;
@@ -206,6 +207,7 @@ function display_flagpage($keyword, $reason) {
 		$vars['url'] = $url;
 		$vars['base'] = $base;
 		$vars['img'] = $img;
+		$vars['css'] = $css;
 
 	$notice = file_get_contents( dirname( __FILE__ ) . '/notice.php' );
 	// Replace all %stuff% in the notice with variable $stuff
