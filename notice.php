@@ -19,7 +19,8 @@
 
 	</head>
 	<body>
-		<div style="padding:10px 50px; text-align: center;" class="well well-lg">
+  	<div style="padding:15px 0px 0px 0px;" class="col-md-6 col-md-offset-3">
+		<div style=" text-align: center;" class="well well-lg">
 		    <div style="display: inline-block; text-align: left">
 
 				<h2 class="text-danger"><img src="user/plugins/YOURLS-Compliance/assets/caution.png" width="30" height="30"/> Caution: This link has been flagged <img src="user/plugins/YOURLS-Compliance/assets/caution.png" width="30" height="30"/></h2>
