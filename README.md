@@ -3,9 +3,11 @@ An anti-abuse plugin written for and tested with YOURLS 1.7.1
 
 By Josh Panter [Unfettered](https://unfettered.net). See it in action at [0=2](https://0eq2.com/) - An Unfettered URL Shortening Service
 
-Compliance is designed to address link complaints from 3rd parties. Compliance implements a flag-list which can be updated via the admin interface or an optional public report-page. This allows any visitor to complain about an abusive URL. The URL is flagged and future visitors are warned and given the option to avoid the link.
+Compliance is designed to address link complaints from 3rd parties. Compliance implements a flag-list which can be updated via the admin interface or an optional public report-page. This allows any visitor to complain about an abusive URL. By default the URL is flagged and future visitors are warned and given the option to avoid the link.
 
-Notification page and abuse report pages are both written with Bootstrap.
+You can set the options to nuke any flagged URL, or to use a custom intercept page for flagged URL visits in the admin section of YOURLS.
+
+The default notification and abuse report pages are both written with Bootstrap.
 
 ## REQUIREMENTS
 
@@ -15,21 +17,21 @@ Notification page and abuse report pages are both written with Bootstrap.
 ### INSTALLATION
 
 1. Place the compliance folder in YOURLS/user/plugins
-2. Copy compliance/config.php.dist to compliance/config.php and edit to suit
-3. Activate Compliance for Yourls in the Admin interface - sql tables should be made automatically
+2. Activate Compliance for Yourls in the Admin interface - sql tables should be made automatically
+3. Set options in the Compliance options page. The default options are just fine. Clicking submit will enter them into the sql tables, but null falls back to default actions as well.
 4. Link abuse.php to the pages/ directory. From YOURLS base directory:
 
 	```bash
   $ ln -s ./user/plugins/compliance/abuse.php ./pages/abuse.php
   ```
-
+  
 #### NOTE: The sql table may need to be added manually using compliance.sql located in compliance/assets/. 
 
 #### CAUTION: When disabling the plugin, tables will be dropped, currently the plugin.php file can be edited to rpevent this.
 
 ### WON'T DO: 
-1. Flagged links need to be sanitized against known blacklists (ex: GSB, etc.) and deleted. This is not a part of the current release, as other plugins can check blacklists before link submission. It is highly reccomended that one of these be used. One job for one program... no monoliths.
-2. Project Honeypot can be implimented in order to prevent known abusers access. This also needs to be it's own entity.
+1. Flagged links need to be sanitized against known blacklists (ex: GSB, etc.) and deleted. This is not a part of the current release, as other plugins, such as [Phishtank-2.0](https://github.com/joshp23/YOURLS-Phishtank-2.0), can check blacklists before link submissionn and recheck them on redirects. It is highly reccomended that one of the blacklist plugins be used. One job for one program... no monoliths.
+2. Project Honeypot can be implimented in order to prevent acces from known abusers. This also needs to be it's own entity.
 
 ### TODO:
 1. Add option to keep tables on deactivation in config file.
