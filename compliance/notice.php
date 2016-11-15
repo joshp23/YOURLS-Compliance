@@ -3,7 +3,7 @@
 
 		<meta charset="utf-8">
 		<title>Caution!</title>
-		<link rel="icon" href="%img" type="image/png" />
+		<link rel="icon" href="%img%" type="image/png" />
 
     		<!-- Bootstrap core CSS -- USE LOCAL CACHE
    		<link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/spacelab/bootstrap.min.css" rel="stylesheet" integrity="sha384-L/tgI3wSsbb3f/nW9V6Yqlaw3Gj7mpE56LWrhew/c8MIhAYWZ/FNirA64AVkB5pI" crossorigin="anonymous"> -->
@@ -20,10 +20,10 @@
 	</head>
 	<body>
   	<div style="padding:15px 0px 0px 0px;" class="col-md-6 col-md-offset-3">
-		<div style=" text-align: center;" class="well well-lg">
+		<div  style="text-align: center;" class="well well-lg">
 		    <div style="display: inline-block; text-align: left">
 
-				<h2 class="text-danger"><img src="%img%" width="30" height="30"/> Caution: This link has been flagged <img src="%img" width="30" height="30"/></h2>
+				<h2 class="text-danger"><img src="%img%" width="30" height="30"/> Caution: This link has been flagged <img src="%img%" width="30" height="30"/></h2>
 				<p>You have requested short URL <strong><a href="%base%/%keyword%">%base%/%keyword%</a></strong></p>
 				<p>This link been flagged as <span class="text-danger">potentially harmful</span> by our community with the following explanation:</p>
 
@@ -45,5 +45,6 @@
 				<p>Thank you.</p>
     		</div>
 		</div>
+	</div>
 	</body>
 </html>
