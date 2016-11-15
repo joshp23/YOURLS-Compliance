@@ -14,16 +14,16 @@ Notification page and abuse report pages are both written with Bootstrap.
 
 ### INSTALLATION
 
-1. Place the YOURLS-Compliance folder in YOURLS/user/plugins
-2. Copy YOURLS-Compliance/config.php.dist to YOURLS-Compliance/config.php and edit to suit
+1. Place the compliance folder in YOURLS/user/plugins
+2. Copy compliance/config.php.dist to compliance/config.php and edit to suit
 3. Activate Compliance for Yourls in the Admin interface - sql tables should be made automatically
 4. Link abuse.php to the pages/ directory. From YOURLS base directory:
 
 	```bash
-  $ ln -s ./user/plugins/YOURLS-Compliance/abuse.php ./pages/abuse.php
+  $ ln -s ./user/plugins/compliance/abuse.php ./pages/abuse.php
   ```
 
-#### NOTE: The sql table may need to be added manually using compliance.sql located in assets/. 
+#### NOTE: The sql table may need to be added manually using compliance.sql located in compliance/assets/. 
 
 #### CAUTION: When disabling the plugin, tables will be dropped, currently the plugin.php file can be edited to rpevent this.
 
