@@ -1,6 +1,23 @@
 <?php
 // Compliance plugin for Yourls - URL Shortener ~ Complaint report page
 // Copyright (c) 2016, Josh Panter <joshu@unfettered.net>
+//
+// Make sure we're in YOURLS context
+if( !defined( 'YOURLS_ABSPATH' ) ) {
+?>
+<html>
+	<head>
+		<meta http-equiv="refresh" content="5;url=../">
+	</head>
+	<body>
+		<h2 style="position: absolute; top: 50%; left: 50%; transform: translateX(-50%) translateY(-50%);">You are trying to access an offlimits path. If you are not redirected automatically, please return to our <a href='/'>home</a> page. Thank you.</h2>
+	</body>
+</html>
+
+<?php
+	die();
+	}
+// Resume normal function
 global $ydb;
 ?>
 <html lang="en">
