@@ -86,17 +86,24 @@ if( !defined( 'YOURLS_ABSPATH' ) ) {
 				global $ydb;
 				$table = "flagged";
 
-				$insert = $ydb->query("REPLACE INTO `$table` (keyword, reason, addr) VALUES ('$alias', '$reason', '$contact')");
+				if (yourls_keyword_is_taken( $alias ) == true) {
 
+					$insert = $ydb->query("REPLACE INTO `$table` (keyword, reason, addr) VALUES ('$alias', '$reason', '$contact')");
+					$result = "
+					<div class='alert alert-dismissible alert-success'>
+						<strong>Success</strong> <b>http://$_SERVER[HTTP_HOST]/$alias</b> has been flagged. <a href='https://$_SERVER[HTTP_HOST]'>Click here</a> to return to the main page.
+					</div>";
+				} else {
 				$result = "
-				<div class='alert alert-dismissible alert-success'>
-					<strong>Success</strong> <b>http://$_SERVER[HTTP_HOST]/$alias</b> has been flagged. <a href='https://$_SERVER[HTTP_HOST]'>Click here</a> to return to the main page.
-				</div>";
+					<div class='alert alert-dismissible alert-danger'>
+						<strong>ERROR: <b>http://$_SERVER[HTTP_HOST]/$alias</b> No such URL in our database. Please try again, or <a href='https://$_SERVER[HTTP_HOST]'>click here</a> to return to the main page.</strong>
+					</div>";
 				}
+				
+			}
 		}
 	}
-	?>
-
+        ?>
 	<form class="form-horizontal" method="post" action="">
 	<fieldset>
 
