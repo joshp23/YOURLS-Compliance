@@ -83,5 +83,4 @@ function display_flagpage($keyword, $reason) {
 
 	die();
 }
-
 ?>
