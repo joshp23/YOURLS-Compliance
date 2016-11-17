@@ -166,6 +166,7 @@ function compliance_do_page() {
 						<input type="hidden" name="nonce" value="$nonce" />
 						<p><input type="submit" value="FLUSH!" /></p>
 					</form>
+					<p>Don't forget to return here after submitting to check for errors!</p>
 				</div>
 
 				<div  id="stat_tab_flag_list" class="tab">
@@ -187,6 +188,7 @@ function flag_list() {
 		echo <<<HTML
 
 		<p>When flagging a url from here, make sure that you only put in the alias, the part after the slash. So if you are flagging https://example.com/<b>THIS</b> -> only add <b>THIS</b>.</p>
+		<p>Don't forget to return here after submitting to check for messages!</p>
 		
 		<form method="post">
 			<table id="main_table" class="tblSorter" border="1" cellpadding="5" style="border-collapse: collapse">
