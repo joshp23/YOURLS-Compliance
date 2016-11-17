@@ -7,56 +7,18 @@ Version: 1.0
 Author: Josh Panter
 Author URI: https://unfettered.net
 */
-// Compliance plugin for Yourls - URL Shortener
-// Copyright (c) 2016, Josh Panter <joshu@unfettered.net>
-
 // No direct call
 if( !defined( 'YOURLS_ABSPATH' ) ) die();
 
-// Create tables for this plugin when activated
-yourls_add_action( 'activated_compliance/plugin.php', 'compliance_activated' );
-function compliance_activated() {
+// Database, Sys Admin, and Flag Check Functions
+require ('inc/db.php');
+require ('inc/sys.php');
+require ('inc/chk.php');
 
-	global $ydb;
+//// ADMIN PAGE FUNCTIONS
 
-	$init = yourls_get_option('compliance_init');
-	if ($init === false) {
-		// Create the init value
-		yourls_add_option('compliance_init', time());
-		// Create the flag table
-		$table_flagged  = "CREATE TABLE IF NOT EXISTS flagged (";
-		$table_flagged .= "keyword varchar(200) NOT NULL, ";
-		$table_flagged .= "clicks int(10) NOT NULL default 0, ";
-		$table_flagged .= "timestamp timestamp NOT NULL default CURRENT_TIMESTAMP, ";
-		$table_flagged .= "reason text, ";
-		$table_flagged .= "addr varchar(200) default NULL, ";
-		$table_flagged .= "PRIMARY KEY (keyword) ";
-		$table_flagged .= ") ENGINE=MyISAM DEFAULT CHARSET=latin1;";
-		$tables = $ydb->query($table_flagged);
-
-		yourls_update_option('compliance_init', time());
-		$init = yourls_get_option('compliance_init');
-		if ($init === false) {
-			die("Unable to properly enable Compliance due an apparent problem with the database.");
-		}
-	}
-}
-// This section will delete all tables when plugin is deactivated - comment out to save flag data
-yourls_add_action('deactivated_compliance/plugin.php', 'compliance_deactivate');
-
-function compliance_deactivate() {
-	global $ydb;
-	
-	$init = yourls_get_option('compliance_init');
-	if ($init !== false) {
-		yourls_delete_option('compliance_init');
-		$ydb->query("DROP TABLE IF EXISTS flagged");
-	}
-}
-
-// Add forms to work with flagged links
+// Register admin forms
 yourls_add_action( 'plugins_loaded', 'compliance_add_pages' );
-
 function compliance_add_pages() {
         yourls_register_plugin_page( 'compliance', 'Compliance', 'compliance_do_page' );
 }
@@ -64,18 +26,9 @@ function compliance_add_pages() {
 // Display page 0 - skelleton and flow
 function compliance_do_page() {
 
-	// Check if the behavior form was submitted
-	if( isset( $_POST['compliance_nuke'] ) ) {
-		// Check nonce
-		yourls_verify_nonce( 'compliance' );
-		
-		// Process behavior form - update option in database
-		yourls_update_option( 'compliance_nuke', $_POST['compliance_nuke'] );
-		if(isset($_POST['compliance_cust_toggle'])) yourls_update_option( 'compliance_cust_toggle', $_POST['compliance_cust_toggle'] );
-		if(isset($_POST['compliance_intercept'])) yourls_update_option( 'compliance_intercept', $_POST['compliance_intercept'] );
-		//if(isset($_POST['compliance_flush_db'])) yourls_update_option( 'compliance_flush_db', $_POST['compliance_flush_db'] );
-	}
-	// Get values from database
+	// CHECK if the BEHAVIOR form was submitted
+	compliance_update_op_behavior();
+
 	$compliance_nuke = yourls_get_option( 'compliance_nuke' );
 
 	if ($compliance_nuke == "false" || $compliance_nuke == null) {
@@ -97,73 +50,170 @@ function compliance_do_page() {
 		$url_chk = 'checked';
 		$vis_url = 'inline';
 		}
+		
 	$compliance_intercept = yourls_get_option( 'compliance_intercept' );
+
+	// CHECK if the DATABASE form was submitted
+	compliance_update_op_db();
+
+	$compliance_table_drop = yourls_get_option( 'compliance_table_drop' );
+
+	if ($compliance_table_drop == "false") {
+		$drop_chk = null;
+		}
+	if ($compliance_table_drop == "true" || $compliance_table_drop == null) {
+		$drop_chk = 'checked';
+		}
+
+	// CHECK if the DATABASE FLUSH form was submitted
+	compliance_flush_flags();
+
 	// Create nonce
 	$nonce = yourls_create_nonce( 'compliance' );
 
+	// Main interface html
+
 	echo <<<HTML
 
-		<h2>Handling Compliance Behavior</h2>
-		<p>The default behavior in Compliance is to preserve flagged links, opting to intercept all flagged redirects, and notify the users with an informational warning page, thus giving them the choice of action. This prevents abusive arbitrary deleting or disabling of short URLS by the public.</p>
-		<p>This behavior can be overridden here, functionally allowing any user with access to the abuse page to delete any Short URL. <b>Use with caution</b>. This will make it so that if a flagged link is visited after being flagged, instead of interception the Short URL is merely deleted from the database.</p>
+		<link rel="stylesheet" href="/css/infos.css?v=1.7.2" type="text/css" media="screen" />
+		<script src="/js/infos.js?v=1.7.2" type="text/javascript"></script>
+
+		<div id="wrap">
+
+			<div class="sub_wrap">
+			<div id="tabs">
+		
+				<div class="wrap_unfloat">
+					<ul id="headers" class="toggle_display stat_tab">
+						<li class="selected"><a href="#stat_tab_behavior"><h2>Behavior</h2></a></li>
+						<li style="display:$vis_del;"><a href="#stat_tab_flag_list"><h2>Flag List</h2></a></li>
+						<li><a href="#stat_tab_db"><h2>Database Settings</h2></a></li>
+					</ul>
+				</div>
+
+				<div id="stat_tab_behavior" class="tab">
+
+					<h2>Handling Compliance Behavior</h2>
+
+					<p>The default behavior in Compliance is to preserve flagged links, opting to intercept all flagged redirects, and notify the users with an informational warning page, thus giving them the choice of action. This prevents abusive arbitrary deleting or disabling of short URLS by the public.</p>
+
+					<h3>Override Defaut: Flag & Intercept</h3>
+
+					<p>This functionally allows any user with access to the abuse page to delete any Short URL. <b>Use with caution</b>. This will make it so that if a flagged link is visited after being flagged, instead of interception the Short URL is merely deleted from the database.</p>
 	
-		<form method="post">
-			<div class="checkbox">
-			  <label>
-			    <input type="hidden" name="compliance_nuke" value="false" />
-			    <input name="compliance_nuke" type="checkbox" value="true" $nuke_chk > Delete all flagged links?
-			  </label>
-			</div>
+					<form method="post">
+						<div class="checkbox">
+						  <label>
+							<input name="compliance_nuke" type="hidden" value="false" />
+							<input name="compliance_nuke" type="checkbox" value="true" $nuke_chk > Delete flagged links? (instead of interecept)
+						  </label>
+						</div>
 
-			<input type="hidden" name="nonce" value="$nonce" />
+						<div style="display:$vis_del;">
 
-			<div style="display:$vis_del;">
-				<p>Compliance provides a well formed and functional Notice, or warning page written in bootstrap. You can opt to use your own, however.</p>
-				<div class="checkbox">
-				  <label>
-				    <input type="hidden" name="compliance_cust_toggle" value="false" />
-				    <input name="compliance_cust_toggle" type="checkbox" value="true" $url_chk >Use Custom Intercept URL?
-				  </label>
+					<h3>Override Default: Intercept Page</h3>
+
+							<p>Compliance provides a well formed and functional Notice, or warning page written in bootstrap. You can opt to use your own, however.</p>
+
+							<div class="checkbox">
+							  <label>
+								<input name="compliance_cust_toggle" type="hidden" value="false" />
+								<input name="compliance_cust_toggle" type="checkbox" value="true" $url_chk >Use Custom Intercept URL?
+							  </label>
+							</div>
+							<div style="display:$vis_url;">
+
+								<p>Setting the above option without setting this will result in an endles refresh.</p>
+
+								<p><label for="compliance_intercept">Enter intercept URL here</label> <input type="text" size=40 id="compliance_intercept" name="compliance_intercept" value="$compliance_intercept" /></p>
+							</div>
+
+						</div>
+						<input type="hidden" name="nonce" value="$nonce" />
+						<p><input type="submit" value="Submit" /></p>
+					</form>
 				</div>
-				<div style="display:$vis_url;">
-					<p>Setting the above option without setting this will result in an endles refresh.</p>
-					<p><label for="compliance_intercept">Enter intercept URL here</label> <input type="text" size=40 id="compliance_intercept" name="compliance_intercept" value="$compliance_intercept" /></p>
-				</div>
-			</div>
 
-			<p><input type="submit" value="Submit" /></p>
-		</form>
-		<div style="display:$vis_del;">
- 			<h2>Flagged URL List</h2>
-		</div>
+				<div id="stat_tab_db" class="tab">
+
+					<h2>Database Settings</h2>
+
+					<h3>Table management on plugin disable</h3>
+
+					<p>By default Compliance will drop its databse table when the plugin is disabled. You can override this setting here.</p>
+					<form method="post">
+						<div class="checkbox">
+						  <label>
+							<input name="compliance_table_drop" type="hidden" value="false" />
+							<input name="compliance_table_drop" type="checkbox" value="true" $drop_chk > Drop Compliance table on disable?
+						  </label>
+						</div>
+						<input type="hidden" name="nonce" value="$nonce" />
+						<p><input type="submit" value="Submit" /></p>
+					</form>
+
+					<h3>Flush Flaglist Data</h3>
+
+					<p>This will give you a fresh and clean table.</p>
+
+					<form method="post">
+						<div class="checkbox">
+						  <label>
+							<input name="compliance_table_flush" type="hidden" value="no" />
+							<input name="compliance_table_flush" type="checkbox" value="yes"> Are you sure you want to flush the table?
+						  </label>
+						</div>
+						<input type="hidden" name="nonce" value="$nonce" />
+						<p><input type="submit" value="FLUSH!" /></p>
+					</form>
+				</div>
+
+				<div  id="stat_tab_flag_list" class="tab">
+
+		 			<h2>Flagged URL List</h2>
 HTML;
 
-        if( isset( $_GET['action'] ) && $_GET['action'] == 'unflag' ) {
-                remove_flag();
-	} else if( isset( $_POST['action'] ) && $_POST['action'] == 'flag' ) {
-                flag_add();
-        } else {
-                flag_list();
-        }
+    compliance_flag_list_mgr(); // sys
 }
-// Display page 0.1 - listing the flags
+
+// Display page 0.1 - listing the flags !IF NO NUKES!
 function flag_list() {
+	// should we bother with this data, has the "nuke" option been set?"
 	$compliance_nuke = yourls_get_option( 'compliance_nuke' );
 	if ($compliance_nuke == "false" || $compliance_nuke == null) {
-
+		// no nuke, draw flaglist page ~ this picks up where the html in Display page 0 leaves off.
 		global $ydb;
-		echo "<p>When flagging a url from here, make sure that you only put in the alias, the part after the slash. So if you are flagging https://example.com/<b>THIS</b> -> only add <b>THIS</b>.</p>";
-		echo "<form method=\"post\">\n";
-		echo "<table id=\"main_table\" class=\"tblSorter\" border=\"1\" cellpadding=\"5\" style=\"border-collapse: collapse\">\n";
-		echo "<thead><tr><th>Flagged Short URL</th><th>Reason</th><th>Email</th><th>Date</th><th>Clicks</th><th>&nbsp;</th></tr></thead>\n";
-		echo "<tbody>\n";
-		echo "<tr><td><input type=\"text\" name=\"alias\" size=12></td>";
-		echo "<td><input type=\"text\" name=\"reason\" size=40></td>";
-		echo "<td><input type=\"text\" name=\"reportemail\" size=30></td>";
-		echo "<td><size=30>n/a</td>";
-		echo "<td><size=10>n/a</td>";
-		echo "<td colspan=3 align=right><input type=submit name=\"submit\" value=\"Flag this!\"><input type=\"hidden\" name=\"action\" value=\"flag\"></td></tr>";
 
+		echo <<<HTML
+
+		<p>When flagging a url from here, make sure that you only put in the alias, the part after the slash. So if you are flagging https://example.com/<b>THIS</b> -> only add <b>THIS</b>.</p>
+		
+		<form method="post">
+			<table id="main_table" class="tblSorter" border="1" cellpadding="5" style="border-collapse: collapse">
+				<thead>
+					<tr>
+						<th>Flagged Alias</th>
+						<th>Reason</th>
+						<th>Email</th>
+						<th>Time and Date of Complaint</th>
+						<th>Clicks</th>
+						<th>&nbsp;</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><input type="text" name="alias" size=8></td>
+						<td><input type="text" name="reason" size=30></td>
+						<td><input type="text" name="contact" size=20></td>
+						<td><input type="text" name="date" size=12 disabled></td>
+						<td><input type="text" name="date" size=3 disabled></td>
+						<td colspan=3 align=right>
+							<input type=submit name="submit" value="Flag this!">
+							<input type="hidden" name="action" value="flag">
+						</td>
+					</tr>
+
+HTML;
 		$table = 'flagged';
 		$flagged_list = $ydb->get_results("SELECT * FROM `$table` ORDER BY timestamp DESC");
 		$found_rows = false;
@@ -173,41 +223,51 @@ function flag_list() {
 				$alias = $flag->keyword;
 				$timestamp = strtotime($flag->timestamp);
 				$reason = $flag->reason;
-				$reportemail = $flag->addr;
+				$contact = $flag->addr;
 				$clicks = $flag->clicks;
-				$date = date( 'M d, Y H:i', $timestamp+( YOURLS_HOURS_OFFSET * 3600) );
-				echo "<tr><td>$alias</td>";
-				echo "<td>$reason</td>";
-				echo "<td>$reportemail</td>";
-				echo "<td>$date</td>";
-				echo "<td>$clicks</td>";
-				echo "<td><a href=\"".$_SERVER['PHP_SELF']."?page=compliance&action=unflag&key=$alias\"><img src=\"/images/delete.png\" title=\"UnFlag\" align=right border=0></a></td></tr>\n";
+				$date = date( 'M d, Y H:i', $timestamp);
+				$unflag = ''. $_SERVER['PHP_SELF'] .'?page=compliance&action=unflag&key='. $alias .'';
+				echo <<<HTML
+					<tr>
+						<td>$alias</td>
+						<td>$reason</td>
+						<td>$contact</td>
+						<td>$date</td>
+						<td>$clicks</td>
+						<td><a href="$unflag">Unflag <img src="/images/delete.png" title="UnFlag" border=0></a></td>
+					</tr>
+HTML;
 			}
 		}
 		echo "</tbody>\n";
 		echo "</table>\n";
 		echo "</form>\n";
 	}
+	// close flaglist div and the rest of the settings page
+				echo "</div>\n";
+			echo "</div>\n";
+			echo "</div>\n";
+		echo "</div>\n";
 }
+
 // Display page 0.2 - adding a flag
 function flag_add() {
 	global $ydb;
 
-	$alias = "";
-	$reason = "";
-	$reportemail = "";
-	if(isset($_POST['alias'])) $alias=mysql_escape_string($_POST['alias']);
-	if(isset($_POST['reason'])) $reason=mysql_escape_string($_POST['reason']);
-	if(isset($_POST['reportemail'])) $reportemail=mysql_escape_string($_POST['reportemail']);
+	if (!empty($_POST) && isset($_POST['alias']) && isset($_POST['reason']) && isset($_POST['contact'])) {
 
-	if (!empty($alias)) {
-	    $table = "flagged";
-	    $insert = $ydb->query("REPLACE INTO `$table` (keyword, reason, addr) VALUES ('$alias', '$reason', '$reportemail')");
+		$table = "flagged";
+		$alias = $_POST['alias'];
+		$reason = $_POST['reason'];
+		$contact = $_POST['contact'];
+
+		$insert = $ydb->query("REPLACE INTO `$table` (keyword, reason, addr) VALUES ('$alias', '$reason', '$contact')");
 	}
 
 	flag_list();
 }
-// Display page 0.3 - unflagging a shorturl
+
+// Display page 0.3 - removing a flag
 function remove_flag() {
 	global $ydb;
 
@@ -217,102 +277,7 @@ function remove_flag() {
 		$key = $_GET['key'];
         	$delete = $ydb->query("DELETE FROM `$table` WHERE keyword='$key'");
 	}
-
 	// @@@FIXME@@@ This should probably be rewritten to do a redirect to avoid confusion between GET/POST forms
 	flag_list();
 }
-
-// Flag check hook on basic redirect
-yourls_add_action( 'redirect_shorturl', 'check_safe_redirection' );
-
-// Flag check 0 ~ skelleton and flow
-function check_safe_redirection( $args ) {
-	global $ydb;
-
-        $url = $args[0]; // Target URL to scan
-        $keyword = $args[1]; // Keyword for this request
-       
-	$result = check_flagpage($url, $keyword);  
-
-	if($result !== false) {
-
-		// A hit was found, and we're not nuking. Check for custom intercept
-		$compliance_cust_toggle = yourls_get_option( 'compliance_cust_toggle' );
-		if ($compliance_cust_toggle == "true") {
-			// pass keyword and url to redirect?
-			$compliance_intercept = yourls_get_option( 'compliance_intercept' );
-			yourls_redirect( $compliance_intercept, 302 );
-			die ();
-		}
-		// Or go to default flag intercept
-		display_flagpage($keyword, $result['reason']);
-	}	
-}
-// Flag check 0.1 ~ checking
-function check_flagpage($url, $keyword='') {
-	global $ydb;
-
-	$result = false;
-
-	// Safety check: Was the url flagged?
-	$table = 'flagged';
-	$flagged = $ydb->get_row("SELECT * FROM `$table` WHERE `keyword` = '$keyword'");
-	if( $flagged ) {
-
-		// A hit was found. Check for nuke
-		$compliance_nuke = yourls_get_option( 'compliance_nuke' );
-		if ($compliance_nuke == "true") {
-			// Delete link & die
-			yourls_delete_link_by_keyword( $keyword );
-			yourls_die( 'This short URL has been flagged by our community, and deleted from our records.', 'Domain blacklisted', '403' );
-			}
-		$flagged = (array)$flagged;
-		$result['reason'] = $flagged['reason'];
-	}
-
-	return $result;
-}
-// Flag check 0.2 ~ interstitial warning
-function display_flagpage($keyword, $reason) {
-
-        $title = yourls_get_keyword_title( $keyword );
-        $url   = yourls_get_keyword_longurl( $keyword );
-        $base  = YOURLS_SITE;
-	$img   = yourls_plugin_url( dirname( __FILE__ ).'/assets/caution.png' );
-	$css   = yourls_plugin_url( dirname( __FILE__ ).'/assets/bootstrap.min.css' );
-
-	$vars = array();
-		$vars['keyword'] = $keyword;
-		$vars['reason'] = $reason;
-		$vars['title'] = $title;
-		$vars['url'] = $url;
-		$vars['base'] = $base;
-		$vars['img'] = $img;
-		$vars['css'] = $css;
-
-	$notice = file_get_contents( dirname( __FILE__ ) . '/notice.php' );
-	// Replace all %stuff% in the notice with variable $stuff
-	$notice = preg_replace_callback( '/%([^%]+)?%/', function( $match ) use( $vars ) { return $vars[ $match[1] ]; }, $notice );
-
-	echo $notice;
-
-	die();
-}
-
-// House keeping: Clean up flags on link delete
-yourls_add_action( 'delete_link', 'delete_flagged_link_by_keyword' );
-
-function delete_flagged_link_by_keyword( $args ) {
-	global $ydb;
-
-        $keyword = $args[0]; // Keyword to delete
-
-	// Delete the flag data, no need for it anymore
-	$ftable = "flagged";
-	$ydb->query("DELETE FROM `$ftable` WHERE `keyword` = '$keyword';");
-
-	// Uncomment to delete log-entries for deleted URL
-	$ltable = YOURLS_DB_TABLE_LOG;
-	$ydb->query("DELETE FROM `$ltable` WHERE `shorturl` = '$keyword';");
-
-}
+?>
