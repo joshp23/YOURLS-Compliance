@@ -76,7 +76,7 @@ function display_flagpage($keyword, $reason) {
 		$vars['img'] = $img;
 		$vars['css'] = $css;
 
-	$notice = file_get_contents( dirname( __FILE__ ) . '/../notice.php' );
+	$notice = file_get_contents( dirname( __FILE__ ) . '/../assets/notice.php' );
 	// Replace all %stuff% in the notice with variable $stuff
 	$notice = preg_replace_callback( '/%([^%]+)?%/', function( $match ) use( $vars ) { return $vars[ $match[1] ]; }, $notice );
 
