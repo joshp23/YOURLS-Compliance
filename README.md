@@ -24,7 +24,6 @@ The default flagged redirect interecept and abuse report pages are both written 
 	```bash
   $ ln -s ./user/plugins/compliance/abuse.php ./pages/abuse.php
   ```
- 5. Have fun!
  
 #### NOTE 1: The sql table may need to be added manually using compliance.sql located in compliance/assets/. 
 #### NOTE 2: BUG - if the option to use a custom url is selected, but no url is set, Compliance falls into endless refresh loop on redirect attempts.
