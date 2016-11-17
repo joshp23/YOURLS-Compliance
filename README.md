@@ -34,7 +34,6 @@ The default flagged redirect interecept and abuse report pages are both written 
 ### TODO:
 1. Make flagged URLS colour-coded in main admin interface. 
 2. Add option to flag url in traditional Admin Interface Actions section
-3. Check for validity of url on flag submission (in abuse.php & admin page) & send error on false submission
 
 ### CREDITS
 Scripts used for inspiration and/or copypasta:

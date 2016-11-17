@@ -166,6 +166,7 @@ function compliance_do_page() {
 						<input type="hidden" name="nonce" value="$nonce" />
 						<p><input type="submit" value="FLUSH!" /></p>
 					</form>
+					<p>Don't forget to return here after submitting to check for errors!</p>
 				</div>
 
 				<div  id="stat_tab_flag_list" class="tab">
@@ -187,6 +188,7 @@ function flag_list() {
 		echo <<<HTML
 
 		<p>When flagging a url from here, make sure that you only put in the alias, the part after the slash. So if you are flagging https://example.com/<b>THIS</b> -> only add <b>THIS</b>.</p>
+		<p>Don't forget to return here after submitting to check for messages!</p>
 		
 		<form method="post">
 			<table id="main_table" class="tblSorter" border="1" cellpadding="5" style="border-collapse: collapse">
@@ -253,7 +255,7 @@ HTML;
 // Display page 0.2 - adding a flag
 function flag_add() {
 	global $ydb;
-
+	
 	if (!empty($_POST) && isset($_POST['alias']) && isset($_POST['reason']) && isset($_POST['contact'])) {
 
 		$table = "flagged";
@@ -261,7 +263,12 @@ function flag_add() {
 		$reason = $_POST['reason'];
 		$contact = $_POST['contact'];
 
-		$insert = $ydb->query("REPLACE INTO `$table` (keyword, reason, addr) VALUES ('$alias', '$reason', '$contact')");
+		if (yourls_keyword_is_taken( $alias ) == true) {
+
+			$insert = $ydb->query("REPLACE INTO `$table` (keyword, reason, addr) VALUES ('$alias', '$reason', '$contact')");
+		} else {
+		echo '<h3 style="color:red">ERROR: No such URL in our database. Please try again.</h3>';
+		}
 	}
 
 	flag_list();
