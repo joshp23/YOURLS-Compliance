@@ -253,7 +253,7 @@ HTML;
 // Display page 0.2 - adding a flag
 function flag_add() {
 	global $ydb;
-
+	
 	if (!empty($_POST) && isset($_POST['alias']) && isset($_POST['reason']) && isset($_POST['contact'])) {
 
 		$table = "flagged";
@@ -261,7 +261,12 @@ function flag_add() {
 		$reason = $_POST['reason'];
 		$contact = $_POST['contact'];
 
-		$insert = $ydb->query("REPLACE INTO `$table` (keyword, reason, addr) VALUES ('$alias', '$reason', '$contact')");
+		if (yourls_keyword_is_taken( $alias ) == true) {
+
+			$insert = $ydb->query("REPLACE INTO `$table` (keyword, reason, addr) VALUES ('$alias', '$reason', '$contact')");
+		} else {
+		echo '<h3 style="color:red">ERROR: No such URL in our database. Please try again.</h3>';
+		}
 	}
 
 	flag_list();
