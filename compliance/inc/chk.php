@@ -84,21 +84,4 @@ function display_flagpage($keyword, $reason) {
 	die();
 }
 
-// House keeping: Clean up flags on link delete
-yourls_add_action( 'delete_link', 'delete_flagged_link_by_keyword' );
-
-function delete_flagged_link_by_keyword( $args ) {
-	global $ydb;
-
-    $keyword = $args[0]; // Keyword to delete
-
-	// Delete the flag data, no need for it anymore
-	$ftable = "flagged";
-	$ydb->query("DELETE FROM `$ftable` WHERE `keyword` = '$keyword';");
-
-	// Uncomment to delete log-entries for deleted URL
-	$ltable = YOURLS_DB_TABLE_LOG;
-	$ydb->query("DELETE FROM `$ltable` WHERE `shorturl` = '$keyword';");
-
-}
 ?>
