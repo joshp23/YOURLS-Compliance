@@ -1,8 +1,7 @@
 <?php
-/*
-Compliance plugin for Yourls - URL Shortener ~ database related functions
-Copyright (c) 2016, Josh Panter <joshu@unfettered.net>
-*/
+// Compliance plugin for Yourls - URL Shortener ~ database related functions
+// Copyright (c) 2016, Josh Panter <joshu@unfettered.net>
+
 // No direct call
 if( !defined( 'YOURLS_ABSPATH' ) ) die();
 
