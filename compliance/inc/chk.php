@@ -21,7 +21,8 @@ function check_safe_redirection( $args ) {
 
 		// A hit was found, and we're not nuking. Check for custom intercept
 		$compliance_cust_toggle = yourls_get_option( 'compliance_cust_toggle' );
-		if ($compliance_cust_toggle == "true") {
+		$compliance_intercept = yourls_get_option( 'compliance_intercept' );
+		if (($compliance_cust_toggle == "true") && ($compliance_intercept !== '')) {
 			// pass keyword and url to redirect?
 			$compliance_intercept = yourls_get_option( 'compliance_intercept' );
 			yourls_redirect( $compliance_intercept, 302 );
@@ -63,8 +64,8 @@ function display_flagpage($keyword, $reason) {
     $title = yourls_get_keyword_title( $keyword );
     $url   = yourls_get_keyword_longurl( $keyword );
     $base  = YOURLS_SITE;
-	$img   = yourls_plugin_url( dirname( __FILE__ ).'/assets/caution.png' );
-	$css   = yourls_plugin_url( dirname( __FILE__ ).'/assets/bootstrap.min.css' );
+	$img   = yourls_plugin_url( dirname( __FILE__ ).'/../assets/caution.png' );
+	$css   = yourls_plugin_url( dirname( __FILE__ ).'/../assets/bootstrap.min.css' );
 
 	$vars = array();
 		$vars['keyword'] = $keyword;
@@ -75,7 +76,7 @@ function display_flagpage($keyword, $reason) {
 		$vars['img'] = $img;
 		$vars['css'] = $css;
 
-	$notice = file_get_contents( dirname( __FILE__ ) . '/notice.php' );
+	$notice = file_get_contents( dirname( __FILE__ ) . '/../notice.php' );
 	// Replace all %stuff% in the notice with variable $stuff
 	$notice = preg_replace_callback( '/%([^%]+)?%/', function( $match ) use( $vars ) { return $vars[ $match[1] ]; }, $notice );
 
