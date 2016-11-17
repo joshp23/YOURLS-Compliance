@@ -33,7 +33,7 @@ The default flagged redirect interecept and abuse report pages are both written 
 2. Project Honeypot (or some otehr "gate keeper") implimented in order to prevent acces from known abusers. This needs to be it's own entity.
 
 ### TODO:
-1. MAke flagged URLS colour-coded in main admin interface. 
+1. Make flagged URLS colour-coded in main admin interface. 
 2. Add option to flag url in traditional Admin Interface Actions section
 3. Check for validity of url on flag submission (in abuse.php & admin page) & send error on false submission
 4. Fix the NOTE 2 bug.
