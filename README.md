@@ -25,8 +25,7 @@ The default flagged redirect interecept and abuse report pages are both written 
   $ ln -s ./user/plugins/compliance/abuse.php ./pages/abuse.php
   ```
  
-#### NOTE 1: The sql table may need to be added manually using compliance.sql located in compliance/assets/. 
-#### NOTE 2: BUG - if the option to use a custom url is selected, but no url is set, Compliance falls into endless refresh loop on redirect attempts.
+#### NOTE: The sql table may need to be added manually using compliance.sql located in compliance/assets/. 
 
 ### WON'T DO: 
 1. Flagged links need to be sanitized against known blacklists (ex: GSB, etc.) and deleted. This is not a part of the current release, as other plugins, such as [Phishtank-2.0](https://github.com/joshp23/YOURLS-Phishtank-2.0), can check blacklists before link submissionn and recheck them on redirects. It is highly reccomended that one of the existing blacklist plugins be used.
@@ -36,7 +35,6 @@ The default flagged redirect interecept and abuse report pages are both written 
 1. Make flagged URLS colour-coded in main admin interface. 
 2. Add option to flag url in traditional Admin Interface Actions section
 3. Check for validity of url on flag submission (in abuse.php & admin page) & send error on false submission
-4. Fix the NOTE 2 bug.
 
 ### CREDITS
 Scripts used for inspiration and/or copypasta:
