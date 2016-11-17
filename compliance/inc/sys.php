@@ -15,6 +15,7 @@ function compliance_update_op_behavior() {
 	
 		if(isset($_POST['compliance_cust_toggle'])) yourls_update_option( 'compliance_cust_toggle', $_POST['compliance_cust_toggle'] );
 		if(isset($_POST['compliance_intercept'])) yourls_update_option( 'compliance_intercept', $_POST['compliance_intercept'] );
+		if(isset($_POST['compliance_expose_flags'])) yourls_update_option( 'compliance_expose_flags', $_POST['compliance_expose_flags'] );
 	}
 }
 
@@ -51,20 +52,25 @@ function compliance_flag_list_mgr() {
 	}
 }
 
-// Mark flagged links on admin page
+// Mark flagged links on admin page - todo, add unflag option & link to flaglist
 yourls_add_filter( 'table_add_row', 'show_flagged_tablerow' );
 function show_flagged_tablerow($row, $keyword, $url, $title, $ip, $clicks, $timestamp) {
-	// If the row is malware, make the URL show in red;
-	$WEBPATH=substr(dirname(__FILE__), strlen(YOURLS_ABSPATH));
-	$flagset = check_flagpage($url, $keyword);
-	if($flagset !== false) {
-		$old_key = '/td class="keyword"/';
-		$new_key = 'td class="keyword" style="border-left: 6px solid red;"';
-		$newrow = preg_replace($old_key, $new_key, $row);
+
+	// Check if this is wanted
+	$compliance_expose_flags = yourls_get_option( 'compliance_expose_flags' ); 
+	if($compliance_expose_flags !== "false") {
+
+		// If the row is malware, make the URL show in red;
+		$WEBPATH=substr(dirname(__FILE__), strlen(YOURLS_ABSPATH));
+		$flagset = check_flagpage($url, $keyword);
+		if($flagset !== false) {
+			$old_key = '/td class="keyword"/';
+			$new_key = 'td class="keyword" style="border-left: 6px solid red;"';
+			$newrow = preg_replace($old_key, $new_key, $row);
+		} 
 	} else {
-		$newrow = $row;
+	$newrow = $row;
 	}
-	
 	return $newrow;
 }
 
