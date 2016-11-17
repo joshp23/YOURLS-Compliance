@@ -37,6 +37,7 @@ The default notification and abuse report pages are both written with Bootstrap.
 1. Add option to keep tables on deactivation in config file.
 2. Cause flagged URLS to be colour-coded in main admin interface.
 3. Move to uniform pdo
+4. Check for validity of url on flag submission (in abuse.php & admin page), send error on false submission
 
 ### CREDITS
 Scripts used for inspiration and/or copypasta:
