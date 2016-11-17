@@ -51,6 +51,23 @@ function compliance_flag_list_mgr() {
 	}
 }
 
+// Mark flagged links on admin page
+yourls_add_filter( 'table_add_row', 'show_flagged_tablerow' );
+function show_flagged_tablerow($row, $keyword, $url, $title, $ip, $clicks, $timestamp) {
+	// If the row is malware, make the URL show in red;
+	$WEBPATH=substr(dirname(__FILE__), strlen(YOURLS_ABSPATH));
+	$flagset = check_flagpage($url, $keyword);
+	if($flagset !== false) {
+		$old_key = '/td class="keyword"/';
+		$new_key = 'td class="keyword" style="border-left: 6px solid red;"';
+		$newrow = preg_replace($old_key, $new_key, $row);
+	} else {
+		$newrow = $row;
+	}
+	
+	return $newrow;
+}
+
 // House keeping: Clean up flags on link delete
 yourls_add_action( 'delete_link', 'delete_flagged_link_by_keyword' );
 
