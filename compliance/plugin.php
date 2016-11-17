@@ -28,25 +28,29 @@ function compliance_do_page() {
 
 	// CHECK if the BEHAVIOR form was submitted
 	compliance_update_op_behavior();
-
+	
+	// Retreive BEHAVIOR settings & Set Values
 	$compliance_nuke = yourls_get_option( 'compliance_nuke' );
-
-	if ($compliance_nuke == "false" || $compliance_nuke == null) {
+	if ($compliance_nuke !== "true") {
 		$nuke_chk = null;
 		$vis_del = 'inline';
-		}
-	if ($compliance_nuke == "true") {
+		} else {
 		$nuke_chk = 'checked';
 		$vis_del = 'none';
 		}
 
-	$compliance_cust_toggle = yourls_get_option( 'compliance_cust_toggle' );
+	$compliance_expose_flags = yourls_get_option( 'compliance_expose_flags' ); 
+	if ($compliance_expose_flags !== "false") {
+		$exp_chk = 'checked';
+		} else {
+		$exp_chk = null;
+		}
 
-	if ($compliance_cust_toggle == "false" || $compliance_cust_toggle == null) {
+	$compliance_cust_toggle = yourls_get_option( 'compliance_cust_toggle' );
+	if ($compliance_cust_toggle !== "true") {
 		$url_chk = null;
 		$vis_url = 'none';
-		}
-	if ($compliance_cust_toggle == "true") {
+		} else {
 		$url_chk = 'checked';
 		$vis_url = 'inline';
 		}
@@ -109,9 +113,20 @@ function compliance_do_page() {
 						  </label>
 						</div>
 
+						<h3>Override Defaut: Admin Interface Expose Flags</h3>
+
+						<p>Compliance can check links on the fly and tag flagged links in your admin interface regardless of weather they are going to be nuked on the next redirect or not. If you are serving a large amount of short URL's and you notice big hangs when you open your admin interface you may want to disable this feature.</p>
+
+						<div class="checkbox">
+						  <label>
+							<input name="compliance_expose_flags" type="hidden" value="false" />
+							<input name="compliance_expose_flags" type="checkbox" value="true" $exp_chk > Expose flags on Admin Interface?
+						  </label>
+						</div>
+
 						<div style="display:$vis_del;">
 
-					<h3>Override Default: Intercept Page</h3>
+							<h3>Override Default: Intercept Page</h3>
 
 							<p>Compliance provides a well formed and functional Notice, or warning page written in bootstrap. You can opt to use your own, however.</p>
 
@@ -166,7 +181,7 @@ function compliance_do_page() {
 						<input type="hidden" name="nonce" value="$nonce" />
 						<p><input type="submit" value="FLUSH!" /></p>
 					</form>
-					<p>Don't forget to return here after submitting to check for errors!</p>
+					<p>Don't forget to return here after submitting to check for messages!</p>
 				</div>
 
 				<div  id="stat_tab_flag_list" class="tab">
