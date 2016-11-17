@@ -3,9 +3,15 @@ An anti-abuse plugin written for and tested with YOURLS 1.7.1
 
 By Josh Panter [Unfettered](https://unfettered.net). See it in action at [0=2](https://0eq2.com/) - An Unfettered URL Shortening Service
 
-Compliance is designed to address link complaints from 3rd parties. Compliance implements a flag-list which can be updated via the admin interface or via an optional public report-page. This allows any visitor to complain about a potentially abusive URL. By default a flagged URL is marked in the admin section and future visitors are warned before redirection. They are given the option either continue through or avoid the link at their discretion.
+Compliance is designed to address link complaints from 3rd parties. Compliance implements a flag-list which can be updated via the admin interface or via an optional public report-page. This allows any visitor to complain about a potentially abusive URL which is then marked in the admin section, and future visitors are given the option to either continue through or avoid the link at their discretion.
 
-You can set the options to nuke any flagged URL on its next redirect, to use a custom intercept page for flagged URL visits, and to keep or drop the tables on plugin deactivation in the admin section of YOURLS. You will also find an option to flush your flag-list table and start fresh.
+Compliance is highly customizable. You can set the following options in the admin section of YOURLS:
+
+1. Nuke any flagged URL on its next redirect (Default: preserve the links)
+2. Use a custom intercept page for flagged URL redirects (Default: use the Compliance Bootstrap page)
+3. Expose flags on Admin interface or not (Default: Expose the flags)
+3. Keep or drop the Compliance sql table on plugin deactivation (Default: Drop)
+4. Flush your flag-list table and start fresh.
 
 The default interecept and abuse report pages are both written with Bootstrap.
 
