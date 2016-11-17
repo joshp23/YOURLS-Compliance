@@ -3,11 +3,11 @@ An anti-abuse plugin written for and tested with YOURLS 1.7.1
 
 By Josh Panter [Unfettered](https://unfettered.net). See it in action at [0=2](https://0eq2.com/) - An Unfettered URL Shortening Service
 
-Compliance is designed to address link complaints from 3rd parties. Compliance implements a flag-list which can be updated via the admin interface or via an optional public report-page. This allows any visitor to complain about an abusive URL. By default the URL is flagged and future visitors are warned and given the option to avoid the link.
+Compliance is designed to address link complaints from 3rd parties. Compliance implements a flag-list which can be updated via the admin interface or via an optional public report-page. This allows any visitor to complain about a potentially abusive URL. By default a flagged URL is marked in the admin section and future visitors are warned before redirection. They are given the option either continue through or avoid the link at their discretion.
 
-You can set the options to nuke any flagged URL, to use a custom intercept page for flagged URL visits, and to keep or drop the tables on plugin deactivation in the admin section of YOURLS. You will also find an option to flush your flag-list table and start fresh.
+You can set the options to nuke any flagged URL on its next redirect, to use a custom intercept page for flagged URL visits, and to keep or drop the tables on plugin deactivation in the admin section of YOURLS. You will also find an option to flush your flag-list table and start fresh.
 
-The default flagged redirect interecept and abuse report pages are both written with Bootstrap.
+The default interecept and abuse report pages are both written with Bootstrap.
 
 ## REQUIREMENTS
 
@@ -32,8 +32,7 @@ The default flagged redirect interecept and abuse report pages are both written 
 2. Project Honeypot (or some otehr "gate keeper") implimented in order to prevent acces from known abusers. This needs to be it's own entity.
 
 ### TODO:
-1. Make flagged URLS colour-coded in main admin interface. 
-2. Add option to flag url in traditional Admin Interface Actions section
+1. Add options to flag/unflag url + visit flaglist in traditional Admin Interface section
 
 ### CREDITS
 Scripts used for inspiration and/or copypasta:
