@@ -25,23 +25,21 @@ if( !defined( 'YOURLS_ABSPATH' ) ) die();
 
 				<h2>Handling Compliance Behavior</h2>
 
-				<p>The default behavior in Compliance is to preserve flagged links, opting to intercept all flagged redirects, and notify the users with an informational warning page, thus giving them the choice of action. This prevents abusive arbitrary deleting or disabling of short URLS by the public.</p>
-
 				<h3>Override Defaut: Flag & Intercept</h3>
 
-				<p>This functionally allows any user with access to the abuse page to delete any Short URL. <b>Use with caution</b>. This will make it so that if a flagged link is visited after being flagged, instead of interception the Short URL is merely deleted from the database.</p>
+				<p>To prevent the arbitrary disabling of short URLS by anonymous users, Compliance intercepts all flagged redirects by default, informing visitors and giving them the choice of action. Compliance can simply delete these links from the database instead. <b>Use with caution</b>.</p>
 
 				<form method="post">
 					<div class="checkbox">
 					  <label>
 						<input name="compliance_nuke" type="hidden" value="false" />
-						<input name="compliance_nuke" type="checkbox" value="true" %nuke_chk% > Delete flagged links? (instead of interecept)
+						<input name="compliance_nuke" type="checkbox" value="true" %nuke_chk% > Delete flagged redirects?
 					  </label>
 					</div>
 
-					<h3>Override Defaut: Admin Interface Expose Flags</h3>
+					<h3>Admin Interface Expose Flags</h3>
 
-					<p>Compliance can check links on the fly and tag flagged links in your admin interface regardless of weather they are going to be nuked on the next redirect or not. If you are serving a large amount of short URL's and you notice big hangs when you open your admin interface you may want to disable this feature.</p>
+					<p>If you are serving a large amount of short URL's and you notice hangs when Admin Interface loads, you may want to disable this feature to reduce SQL querries.</p>
 
 					<div class="checkbox">
 					  <label>
@@ -52,9 +50,7 @@ if( !defined( 'YOURLS_ABSPATH' ) ) die();
 
 					<div style="display:%vis_del%;">
 
-						<h3>Override Default: Intercept Page</h3>
-
-						<p>Compliance provides a well formed and functional intercept page written in bootstrap for flagged redirects. You can opt here to use your own, however.</p>
+						<h3>Intercept Page</h3>
 
 						<div class="checkbox">
 						  <label>
@@ -81,7 +77,7 @@ if( !defined( 'YOURLS_ABSPATH' ) ) die();
 
 				<h3>Table management on plugin disable</h3>
 
-				<p>By default Compliance will drop its databse table when the plugin is disabled. You can override this setting here.</p>
+				<p>Compliance automatically drops its databse table when the plugin is disabled. You can override this setting here.</p>
 				<form method="post">
 					<div class="checkbox">
 					  <label>
