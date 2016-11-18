@@ -67,11 +67,14 @@ function show_flagged_tablerow($row, $keyword, $url, $title, $ip, $clicks, $time
 			$old_key = '/td class="keyword"/';
 			$new_key = 'td class="keyword" style="border-left: 6px solid red;"';
 			$newrow = preg_replace($old_key, $new_key, $row);
-		} 
+			return $newrow;
+		} else {
+		$newrow = $row;
+		}
+		return $newrow;
 	} else {
-	$newrow = $row;
+	return $row;
 	}
-	return $newrow;
 }
 
 // House keeping: Clean up flags on link delete
