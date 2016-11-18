@@ -87,7 +87,7 @@ function compliance_do_page() {
 		$vars['nonce'] = $nonce;
 
 	$opt_0_view = file_get_contents( dirname( __FILE__ ) . '/inc/opt.0.php', NULL, NULL, 200);
-	// Replace all %stuff% in the notice with variable $stuff
+	// Replace all %stuff% in opt.0 with variable $stuff
 	$opt_0_view = preg_replace_callback( '/%([^%]+)?%/', function( $match ) use( $vars ) { return $vars[ $match[1] ]; }, $opt_0_view );
 
 	echo $opt_0_view;
