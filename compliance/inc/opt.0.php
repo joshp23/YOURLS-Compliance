@@ -54,7 +54,7 @@ if( !defined( 'YOURLS_ABSPATH' ) ) die();
 
 						<h3>Override Default: Intercept Page</h3>
 
-						<p>Compliance provides a well formed and functional Notice, or warning page written in bootstrap. You can opt to use your own, however.</p>
+						<p>Compliance provides a well formed and functional intercept page written in bootstrap for flagged redirects. You can opt here to use your own, however.</p>
 
 						<div class="checkbox">
 						  <label>
