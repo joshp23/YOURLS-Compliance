@@ -76,161 +76,37 @@ function compliance_do_page() {
 	$nonce = yourls_create_nonce( 'compliance' );
 
 	// Main interface html
+	$vars = array();
+		$vars['vis_del'] = $vis_del;
+		$vars['vis_url'] = $vis_url;
+		$vars['nuke_chk'] = $nuke_chk;
+		$vars['exp_chk'] = $exp_chk;
+		$vars['url_chk'] = $url_chk;
+		$vars['drop_chk'] = $drop_chk;
+		$vars['compliance_intercept'] = $compliance_intercept;
+		$vars['nonce'] = $nonce;
 
-	echo <<<HTML
+	$opt_0_view = file_get_contents( dirname( __FILE__ ) . '/inc/opt.0.php', NULL, NULL, 200);
+	// Replace all %stuff% in the notice with variable $stuff
+	$opt_0_view = preg_replace_callback( '/%([^%]+)?%/', function( $match ) use( $vars ) { return $vars[ $match[1] ]; }, $opt_0_view );
 
-		<link rel="stylesheet" href="/css/infos.css?v=1.7.2" type="text/css" media="screen" />
-		<script src="/js/infos.js?v=1.7.2" type="text/javascript"></script>
+	echo $opt_0_view;
 
-		<div id="wrap">
-
-			<div class="sub_wrap">
-			<div id="tabs">
-		
-				<div class="wrap_unfloat">
-					<ul id="headers" class="toggle_display stat_tab">
-						<li class="selected"><a href="#stat_tab_behavior"><h2>Behavior</h2></a></li>
-						<li style="display:$vis_del;"><a href="#stat_tab_flag_list"><h2>Flag List</h2></a></li>
-						<li><a href="#stat_tab_db"><h2>Database Settings</h2></a></li>
-					</ul>
-				</div>
-
-				<div id="stat_tab_behavior" class="tab">
-
-					<h2>Handling Compliance Behavior</h2>
-
-					<p>The default behavior in Compliance is to preserve flagged links, opting to intercept all flagged redirects, and notify the users with an informational warning page, thus giving them the choice of action. This prevents abusive arbitrary deleting or disabling of short URLS by the public.</p>
-
-					<h3>Override Defaut: Flag & Intercept</h3>
-
-					<p>This functionally allows any user with access to the abuse page to delete any Short URL. <b>Use with caution</b>. This will make it so that if a flagged link is visited after being flagged, instead of interception the Short URL is merely deleted from the database.</p>
-	
-					<form method="post">
-						<div class="checkbox">
-						  <label>
-							<input name="compliance_nuke" type="hidden" value="false" />
-							<input name="compliance_nuke" type="checkbox" value="true" $nuke_chk > Delete flagged links? (instead of interecept)
-						  </label>
-						</div>
-
-						<h3>Override Defaut: Admin Interface Expose Flags</h3>
-
-						<p>Compliance can check links on the fly and tag flagged links in your admin interface regardless of weather they are going to be nuked on the next redirect or not. If you are serving a large amount of short URL's and you notice big hangs when you open your admin interface you may want to disable this feature.</p>
-
-						<div class="checkbox">
-						  <label>
-							<input name="compliance_expose_flags" type="hidden" value="false" />
-							<input name="compliance_expose_flags" type="checkbox" value="true" $exp_chk > Expose flags on Admin Interface?
-						  </label>
-						</div>
-
-						<div style="display:$vis_del;">
-
-							<h3>Override Default: Intercept Page</h3>
-
-							<p>Compliance provides a well formed and functional Notice, or warning page written in bootstrap. You can opt to use your own, however.</p>
-
-							<div class="checkbox">
-							  <label>
-								<input name="compliance_cust_toggle" type="hidden" value="false" />
-								<input name="compliance_cust_toggle" type="checkbox" value="true" $url_chk >Use Custom Intercept URL?
-							  </label>
-							</div>
-							<div style="display:$vis_url;">
-
-								<p>Setting the above option without setting this will result in an endles refresh.</p>
-
-								<p><label for="compliance_intercept">Enter intercept URL here</label> <input type="text" size=40 id="compliance_intercept" name="compliance_intercept" value="$compliance_intercept" /></p>
-							</div>
-
-						</div>
-						<input type="hidden" name="nonce" value="$nonce" />
-						<p><input type="submit" value="Submit" /></p>
-					</form>
-				</div>
-
-				<div id="stat_tab_db" class="tab">
-
-					<h2>Database Settings</h2>
-
-					<h3>Table management on plugin disable</h3>
-
-					<p>By default Compliance will drop its databse table when the plugin is disabled. You can override this setting here.</p>
-					<form method="post">
-						<div class="checkbox">
-						  <label>
-							<input name="compliance_table_drop" type="hidden" value="false" />
-							<input name="compliance_table_drop" type="checkbox" value="true" $drop_chk > Drop Compliance table on disable?
-						  </label>
-						</div>
-						<input type="hidden" name="nonce" value="$nonce" />
-						<p><input type="submit" value="Submit" /></p>
-					</form>
-
-					<h3>Flush Flaglist Data</h3>
-
-					<p>This will give you a fresh and clean table.</p>
-
-					<form method="post">
-						<div class="checkbox">
-						  <label>
-							<input name="compliance_table_flush" type="hidden" value="no" />
-							<input name="compliance_table_flush" type="checkbox" value="yes"> Are you sure you want to flush the table?
-						  </label>
-						</div>
-						<input type="hidden" name="nonce" value="$nonce" />
-						<p><input type="submit" value="FLUSH!" /></p>
-					</form>
-					<p>Don't forget to return here after submitting to check for messages!</p>
-				</div>
-
-				<div  id="stat_tab_flag_list" class="tab">
-
-		 			<h2>Flagged URL List</h2>
-HTML;
-
-    compliance_flag_list_mgr(); // sys
+	compliance_flag_list_mgr(); // sys
 }
 
 // Display page 0.1 - listing the flags !IF NO NUKES!
 function flag_list() {
 	// should we bother with this data, has the "nuke" option been set?"
 	$compliance_nuke = yourls_get_option( 'compliance_nuke' );
-	if ($compliance_nuke == "false" || $compliance_nuke == null) {
-		// no nuke, draw flaglist page ~ this picks up where the html in Display page 0 leaves off.
+	if ($compliance_nuke !== "true") {
+		// no nuke, draw flaglist page ~ this picks up where opt.0.php leaves off.
 		global $ydb;
 
-		echo <<<HTML
-
-		<p>When flagging a url from here, make sure that you only put in the alias, the part after the slash. So if you are flagging https://example.com/<b>THIS</b> -> only add <b>THIS</b>.</p>
-		<p>Don't forget to return here after submitting to check for messages!</p>
+		$opt_1_view = file_get_contents( dirname( __FILE__ ) . '/inc/opt.1.php', NULL, NULL, 200);
+		echo $opt_1_view;
 		
-		<form method="post">
-			<table id="main_table" class="tblSorter" border="1" cellpadding="5" style="border-collapse: collapse">
-				<thead>
-					<tr>
-						<th>Flagged Alias</th>
-						<th>Reason</th>
-						<th>Email</th>
-						<th>Time and Date of Complaint</th>
-						<th>Clicks</th>
-						<th>&nbsp;</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td><input type="text" name="alias" size=8></td>
-						<td><input type="text" name="reason" size=30></td>
-						<td><input type="text" name="contact" size=20></td>
-						<td><input type="text" name="date" size=12 disabled></td>
-						<td><input type="text" name="date" size=3 disabled></td>
-						<td colspan=3 align=right>
-							<input type=submit name="submit" value="Flag this!">
-							<input type="hidden" name="action" value="flag">
-						</td>
-					</tr>
-
-HTML;
+		// populate table rows with flag data if there is any
 		$table = 'flagged';
 		$flagged_list = $ydb->get_results("SELECT * FROM `$table` ORDER BY timestamp DESC");
 		$found_rows = false;
@@ -244,6 +120,7 @@ HTML;
 				$clicks = $flag->clicks;
 				$date = date( 'M d, Y H:i', $timestamp);
 				$unflag = ''. $_SERVER['PHP_SELF'] .'?page=compliance&action=unflag&key='. $alias .'';
+				// print if there is any data
 				echo <<<HTML
 					<tr>
 						<td>$alias</td>
