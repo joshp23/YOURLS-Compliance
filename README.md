@@ -35,7 +35,7 @@ The default interecept and abuse report pages are both written with Bootstrap.
 
 ### WON'T DO: 
 1. Flagged links need to be sanitized against known blacklists (ex: GSB, etc.) and deleted. This is not a part of the current release, as other plugins, such as [Phishtank-2.0](https://github.com/joshp23/YOURLS-Phishtank-2.0), can check blacklists before link submissionn and recheck them on redirects. It is highly reccomended that one of the existing blacklist plugins be used.
-2. Project Honeypot (or some otehr "gate keeper") implimented in order to prevent acces from known abusers. This needs to be it's own entity.
+2. Project Honeypot's http:BL implimented in order to prevent acces from known abusers. This very necessary feature ~~needs to be~~ has already been turned into it's own entity, [here](https://github.com/joshp23/YOURLS-httpBL).
 
 ### TODO:
 1. Add options to flag/unflag url + visit flaglist in traditional Admin Interface section
