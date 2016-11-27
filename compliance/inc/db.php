@@ -33,15 +33,18 @@ function compliance_activated() {
 		}
 	}
 }
-// Delete table when plugin is deactivated - comment out to save flag data
+// Delete table when plugin is deactivated
 yourls_add_action('deactivated_compliance/plugin.php', 'compliance_deactivate');
 function compliance_deactivate() {
-	global $ydb;
+	$compliance_table_drop = yourls_get_option('compliance_table_drop');
+	if ( $compliance_table_drop !== 'false' ) {
+		global $ydb;
 	
-	$init = yourls_get_option('compliance_init');
-	if ($init !== false) {
-		yourls_delete_option('compliance_init');
-		$ydb->query("DROP TABLE IF EXISTS flagged");
+		$init = yourls_get_option('compliance_init');
+		if ($init !== false) {
+			yourls_delete_option('compliance_init');
+			$ydb->query("DROP TABLE IF EXISTS flagged");
+		}
 	}
 }
 
