@@ -140,7 +140,6 @@ HTML;
 	// close flaglist div and the rest of the settings page
 				echo "</div>\n";
 			echo "</div>\n";
-			echo "</div>\n";
 		echo "</div>\n";
 }
 
