@@ -9,8 +9,6 @@ if( !defined( 'YOURLS_ABSPATH' ) ) die();
 	<script src="/js/infos.js?v=1.7.2" type="text/javascript"></script>
 
 	<div id="wrap">
-
-		<div class="sub_wrap">
 		<div id="tabs">
 
 			<div class="wrap_unfloat">
