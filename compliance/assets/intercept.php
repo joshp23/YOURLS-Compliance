@@ -25,7 +25,7 @@
 
 				<h2 class="text-danger"><img src="%img%" width="30" height="30"/> Caution: This link has been flagged <img src="%img%" width="30" height="30"/></h2>
 				<p>You have requested short URL <strong><a href="%base%/%keyword%">%base%/%keyword%</a></strong></p>
-				<p>This link been flagged as <span class="text-danger">potentially harmful</span> by our community with the following explanation:</p>
+				<p>This link has been flagged as <span class="text-danger">potentially harmful</span> by our community with the following explanation:</p>
 
 				<blockquote>
 					<p>%reason%</p>
