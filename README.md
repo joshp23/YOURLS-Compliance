@@ -28,7 +28,7 @@ The default interecept and abuse report pages are both written with Bootstrap.
 4. Link abuse.php to the pages/ directory. From YOURLS base directory:
 
 	```bash
-  $ ln -s ./user/plugins/compliance/abuse.php ./pages/abuse.php
+  $ ln -s ./user/plugins/compliance/assets/abuse.php ./pages/abuse.php
   ```
  
 #### NOTE: The sql table may need to be added manually using compliance.sql located in compliance/assets/. 
@@ -38,7 +38,7 @@ The default interecept and abuse report pages are both written with Bootstrap.
 2. Project Honeypot's http:BL implimented in order to prevent acces from known abusers. This very necessary feature ~~needs to be~~ has already been turned into it's own entity, [here](https://github.com/joshp23/YOURLS-httpBL).
 
 ### TODO:
-1. Add options to flag/unflag url + visit flaglist in traditional Admin Interface section
+Please see the [TODO](https://github.com/joshp23/YOURLS-Compliance/issues/10) list.
 
 ### CREDITS
 Scripts used for inspiration and/or copypasta:
