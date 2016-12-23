@@ -21,8 +21,6 @@ if( !defined( 'YOURLS_ABSPATH' ) ) die();
 
 			<div id="stat_tab_behavior" class="tab">
 
-				<h2>Handling Compliance Behavior</h2>
-
 				<h3>Override Defaut: Flag & Intercept</h3>
 
 				<p>To prevent the arbitrary disabling of short URLS by anonymous users, Compliance intercepts all flagged redirects by default, informing visitors and giving them the choice of action. Compliance can simply delete these links from the database instead. <b>Use with caution</b>.</p>
@@ -49,6 +47,8 @@ if( !defined( 'YOURLS_ABSPATH' ) ) die();
 					<div style="display:%vis_del%;">
 
 						<h3>Intercept Page</h3>
+						
+						<p><strong>Please note</strong>: if you have the <a href="https://github.com/joshp23/YOURLS-Snapshot" target="_blank" >Snapshot</a> Visual Preview plugin installed and enabled, Compliance will attempt to display a screenshot of the target webpage in the default intercept page.</p>
 
 						<div class="checkbox">
 						  <label>
@@ -58,7 +58,7 @@ if( !defined( 'YOURLS_ABSPATH' ) ) die();
 						</div>
 						<div style="display:%vis_url%;">
 
-							<p>Setting the above option without setting this will result in an endles refresh.</p>
+							<p>Setting the above option without setting this will fall back to default behavior.</p>
 
 							<p><label for="compliance_intercept">Enter intercept URL here</label> <input type="text" size=40 id="compliance_intercept" name="compliance_intercept" value="%compliance_intercept%" /></p>
 						</div>

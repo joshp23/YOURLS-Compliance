@@ -3,7 +3,7 @@
 Plugin Name: Compliance
 Plugin URI: https://github.com/joshp23/YOURLS-Compliance
 Description: Provides a way to flag short urls for abuse, and warn users of potential risk.
-Version: 1.0.2
+Version: 1.1.2
 Author: Josh Panter
 Author URI: https://unfettered.net
 */
@@ -315,20 +315,31 @@ function check_flagpage($url, $keyword='') {
 // Flag check 0.2 ~ interstitial warning TEMPLATE
 function display_flagpage($keyword, $reason) {
 
-	$title = yourls_get_keyword_title( $keyword );
-	$url   = yourls_get_keyword_longurl( $keyword );
-	$base  = YOURLS_SITE;
-	$img   = yourls_plugin_url( dirname( __FILE__ ).'/assets/caution.png' );
-	$css   = yourls_plugin_url( dirname( __FILE__ ).'/assets/bootstrap.min.css' );
+	$title 		= yourls_get_keyword_title( $keyword );
+	$url		= yourls_get_keyword_longurl( $keyword );
+	$base		= YOURLS_SITE;
+	$img		= yourls_plugin_url( dirname( __FILE__ ).'/assets/caution.png' );
+	$css 		= yourls_plugin_url( dirname( __FILE__ ).'/assets/bootstrap.min.css' );
+	
+	if((yourls_is_active_plugin('snapshot/plugin.php')) !== false) { 
+		$preview = compliance_snapshot_preview($keyword, $url);
+		$img_li	 = '<li>Preview:</li>';
+	} else {
+		$preview = null;
+		$img_li  = null;
+	}
+	
 
 	$vars = array();
-		$vars['keyword'] = $keyword;
-		$vars['reason'] = $reason;
-		$vars['title'] = $title;
-		$vars['url'] = $url;
-		$vars['base'] = $base;
-		$vars['img'] = $img;
-		$vars['css'] = $css;
+		$vars['keyword'] 	= $keyword;
+		$vars['reason'] 	= $reason;
+		$vars['title'] 		= $title;
+		$vars['url'] 		= $url;
+		$vars['base'] 		= $base;
+		$vars['img'] 		= $img;
+		$vars['css'] 		= $css;
+		$vars['preview'] 	= $preview;
+		$vars['img_li'] 	= $img_li;
 
 	$intercept = file_get_contents( dirname( __FILE__ ) . '/assets/intercept.php' );
 	// Replace all %stuff% in intercept.php with variable $stuff
@@ -337,6 +348,30 @@ function display_flagpage($keyword, $reason) {
 	echo $intercept;
 
 	die();
+}
+
+// Flag check 0.4 ~ image preview
+function compliance_snapshot_preview($keyword, $url) {
+
+	$base 	= YOURLS_SITE;
+	$id 	= 'snapshot';
+	$fn 	= snapshot_request($keyword, $url);
+	
+	if($fn == 'alt') {
+
+		$id = 'snapshot-alt';
+		$fn = array(
+			'sorry.png',
+			'420'
+		);
+	}
+	
+	$now = round(time()/60);
+	$key = md5($now . $id);
+
+	$preview = '<div id="live_p"><img style="display:block;margin:auto;" border=1 src="'.$base.'/srv/?id='.$id.'&key='.$key.'&fn='.$fn[0].'" width="800" /></div>';
+	
+	return $preview;
 }
 /*
  *

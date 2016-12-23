@@ -19,11 +19,11 @@
 
 	</head>
 	<body>
-  	<div style="padding:15px 0px 0px 0px;" class="col-md-6 col-md-offset-3">
+  	<div style="padding:15px 0px 0px 0px;" class="col-md-8 col-md-offset-2">
 		<div  style="text-align: center;" class="well well-lg">
 		    <div style="display: inline-block; text-align: left">
 
-				<h2 class="text-danger"><img src="%img%" width="30" height="30"/> Caution: This link has been flagged <img src="%img%" width="30" height="30"/></h2>
+				<center><h2 class="text-danger"><img src="%img%" width="30" height="30"/> Caution: This link has been flagged <img src="%img%" width="30" height="30"/></h2></center><hr><hr>
 				<p>You have requested short URL <strong><a href="%base%/%keyword%">%base%/%keyword%</a></strong></p>
 				<p>This link has been flagged as <span class="text-danger">potentially harmful</span> by our community with the following explanation:</p>
 
@@ -35,9 +35,10 @@
 				<ul>
 					<li>Page title: <strong>%title%</strong></li>
 					<li>Long URL: <strong><a href="%base%/%keyword%">%url%</a></strong></li>
+					%img_li%
 				</ul>
-
-				<p><strong><a href="https://staysafeonline.org/stay-safe-online/keep-a-clean-machine/spam-and-phishing" target="_blank">Click here</a></strong> for some usefull informaiton on phishing, and keeping yourself safe online.
+				%preview%
+				<p><strong><a href="https://staysafeonline.org/stay-safe-online/keep-a-clean-machine/spam-and-phishing" target="_blank">Click here</a></strong> to learn more about phishing, and for some useful instructions on how to keep yourself safe online.<p>
 				</ br>
 				<p>If you understand the risk, and still want to visit this link, you may do so by <strong><a href="%url%">clicking here</a></strong>.</p>
 				<p><a href="%base%">Click here</a> to go visit our home page.</p>
