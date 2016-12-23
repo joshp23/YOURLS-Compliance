@@ -3,7 +3,9 @@ An anti-abuse plugin written for and tested with YOURLS 1.7.1
 
 By Josh Panter [Unfettered](https://unfettered.net). See it in action at [0=2](https://0eq2.com/) - An Unfettered URL Shortening Service
 
-Compliance is designed to address link complaints from 3rd parties. Compliance implements a flag-list which can be updated via the admin interface or via an optional public report-page. This allows any visitor to complain about a potentially abusive URL which is then marked in the admin section, and future visitors are given the option to either continue through or avoid the link at their discretion.
+Compliance is designed to address link complaints from 3rd parties by implementing a flag-list which can be updated via the admin interface or via an optional public report-page. This allows any visitor to complain about a potentially abusive URL, which is then marked in the admin section and all future visitors are given the option to either continue through or avoid the link at their discretion.
+
+Compliance has seamless integration with the [Snapshot](https://github.com/joshp23/YOURLS-Snapshot) Visual Preview plugin. If Snapshot is installed, properly configured, and enabled, then Compliance will attempt to present a snapshot image of the flagged website upon interception.
 
 Compliance is highly customizable. You can set the following options in the admin section of YOURLS:
 
