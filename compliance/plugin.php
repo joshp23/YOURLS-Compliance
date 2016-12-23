@@ -3,20 +3,18 @@
 Plugin Name: Compliance
 Plugin URI: https://github.com/joshp23/YOURLS-Compliance
 Description: Provides a way to flag short urls for abuse, and warn users of potential risk.
-Version: 1.0.1
+Version: 1.0.2
 Author: Josh Panter
 Author URI: https://unfettered.net
 */
 // No direct call
 if( !defined( 'YOURLS_ABSPATH' ) ) die();
-
-// Database, Sys Admin, and Flag Check Functions
-require ('inc/db.php');
-require ('inc/sys.php');
-require ('inc/chk.php');
-
-//// ADMIN PAGE FUNCTIONS
-
+/*
+ *
+ * ADMIN PAGE FUNCTIONS
+ *
+ *
+*/
 // Register admin forms
 yourls_add_action( 'plugins_loaded', 'compliance_add_pages' );
 function compliance_add_pages() {
@@ -177,5 +175,252 @@ function remove_flag() {
 	}
 	// @@@FIXME@@@ This should probably be rewritten to do a redirect to avoid confusion between GET/POST forms
 	flag_list();
+}
+
+// Mark flagged links on admin page - TODO, add unflag option & link to flaglist
+yourls_add_filter( 'table_add_row', 'show_flagged_tablerow' );
+function show_flagged_tablerow($row, $keyword, $url, $title, $ip, $clicks, $timestamp) {
+
+	// Check if this is wanted
+	$compliance_expose_flags = yourls_get_option( 'compliance_expose_flags' ); 
+	if($compliance_expose_flags !== "false") {
+
+		// If the row is malware, make the URL show in red;
+		$WEBPATH=substr(dirname(__FILE__), strlen(YOURLS_ABSPATH));
+		$flagset = check_flagpage($url, $keyword);
+		if($flagset !== false) {
+			$old_key = '/td class="keyword"/';
+			$new_key = 'td class="keyword" style="border-left: 6px solid red;"';
+			$newrow = preg_replace($old_key, $new_key, $row);
+			return $newrow;
+		} else {
+		$newrow = $row;
+		}
+		return $newrow;
+	} else {
+	return $row;
+	}
+}
+
+/*
+ *
+ *	Form submissions
+ *
+ *
+*/
+// Options updater: Behavior
+function compliance_update_op_behavior() {
+	if(isset( $_POST['compliance_nuke'])) {
+		// Check nonce
+		yourls_verify_nonce( 'compliance' );
+
+		yourls_update_option( 'compliance_nuke', $_POST['compliance_nuke'] );
+	
+		if(isset($_POST['compliance_cust_toggle'])) yourls_update_option( 'compliance_cust_toggle', $_POST['compliance_cust_toggle'] );
+		if(isset($_POST['compliance_intercept'])) yourls_update_option( 'compliance_intercept', $_POST['compliance_intercept'] );
+		if(isset($_POST['compliance_expose_flags'])) yourls_update_option( 'compliance_expose_flags', $_POST['compliance_expose_flags'] );
+	}
+}
+
+// Options updater: DB
+function compliance_update_op_db() {
+	if( isset( $_POST['compliance_table_drop'] ) ) {
+		// Check nonce
+		yourls_verify_nonce( 'compliance' );
+		// Process DATABASE form - update option in database
+		yourls_update_option( 'compliance_table_drop', $_POST['compliance_table_drop'] );
+		}
+}
+
+// Special OPS: Flush FLags
+function compliance_flush_flags() {
+	if( isset( $_POST['compliance_table_flush'] ) ) {
+		if( $_POST['compliance_table_flush'] == 'yes' ) {
+		// Check nonce
+		yourls_verify_nonce( 'compliance' );
+		compliance_db_flush();
+		echo 'Database reset, all falgs dropped. Have a nice day!';
+		}
+	}
+}
+
+// CHECK if FLAG/UNFLAG form was submitted, handle flaglist
+function compliance_flag_list_mgr() {
+ if( isset( $_GET['action'] ) && $_GET['action'] == 'unflag' ) {
+            remove_flag();
+		} else if( isset( $_POST['action'] ) && $_POST['action'] == 'flag' ) {
+            flag_add();
+    	} else {
+            flag_list();
+	}
+}
+/*
+ *
+ *	Flag Checking
+ *
+ *
+*/
+// Hook on basic redirect
+yourls_add_action( 'redirect_shorturl', 'check_safe_redirection' );
+
+// Flag check 0 ~ skelleton and flow
+function check_safe_redirection( $args ) {
+	global $ydb;
+
+        $url = $args[0]; // Target URL to scan
+        $keyword = $args[1]; // Keyword for this request
+       
+	$result = check_flagpage($url, $keyword);  
+
+	if($result !== false) {
+
+		// A hit was found, and we're not nuking. Check for custom intercept
+		$compliance_cust_toggle = yourls_get_option( 'compliance_cust_toggle' );
+		$compliance_intercept = yourls_get_option( 'compliance_intercept' );
+		if (($compliance_cust_toggle == "true") && ($compliance_intercept !== '')) {
+			// How to pass keyword and url to redirect?
+			yourls_redirect( $compliance_intercept, 302 );
+			die ();
+		}
+		// Or go to default flag intercept
+		display_flagpage($keyword, $result['reason']);
+	}	
+}
+
+// Flag check 0.1 ~ checking
+function check_flagpage($url, $keyword='') {
+	global $ydb;
+
+	$result = false;
+
+	// Safety check: Was the url flagged?
+	$table = 'flagged';
+	$flagged = $ydb->get_row("SELECT * FROM `$table` WHERE `keyword` = '$keyword'");
+	if( $flagged ) {
+
+		// A hit was found. Check for nuke
+		$compliance_nuke = yourls_get_option( 'compliance_nuke' );
+		if ($compliance_nuke == "true") {
+			// Delete link & die
+			yourls_delete_link_by_keyword( $keyword );
+			yourls_die('This short URL has been flagged by our community and deleted from our records.', 'Domain blacklisted', '403');
+		}
+		$flagged = (array)$flagged;
+		$result['reason'] = $flagged['reason'];
+	}
+
+	return $result;
+}
+
+// Flag check 0.2 ~ interstitial warning TEMPLATE
+function display_flagpage($keyword, $reason) {
+
+	$title = yourls_get_keyword_title( $keyword );
+	$url   = yourls_get_keyword_longurl( $keyword );
+	$base  = YOURLS_SITE;
+	$img   = yourls_plugin_url( dirname( __FILE__ ).'/assets/caution.png' );
+	$css   = yourls_plugin_url( dirname( __FILE__ ).'/assets/bootstrap.min.css' );
+
+	$vars = array();
+		$vars['keyword'] = $keyword;
+		$vars['reason'] = $reason;
+		$vars['title'] = $title;
+		$vars['url'] = $url;
+		$vars['base'] = $base;
+		$vars['img'] = $img;
+		$vars['css'] = $css;
+
+	$intercept = file_get_contents( dirname( __FILE__ ) . '/assets/intercept.php' );
+	// Replace all %stuff% in intercept.php with variable $stuff
+	$intercept = preg_replace_callback( '/%([^%]+)?%/', function( $match ) use( $vars ) { return $vars[ $match[1] ]; }, $intercept );
+
+	echo $intercept;
+
+	die();
+}
+/*
+ *
+ *	Database
+ *
+ *
+*/
+// Create tables for this plugin when activated
+yourls_add_action( 'activated_compliance/plugin.php', 'compliance_activated' );
+function compliance_activated() {
+
+	global $ydb;
+
+	$init = yourls_get_option('compliance_init');
+	if ($init === false) {
+		// Create the init value
+		yourls_add_option('compliance_init', time());
+		// Create the flag table
+		$table_flagged  = "CREATE TABLE IF NOT EXISTS flagged (";
+		$table_flagged .= "keyword varchar(200) NOT NULL, ";
+		$table_flagged .= "clicks int(10) NOT NULL default 0, ";
+		$table_flagged .= "timestamp timestamp NOT NULL default CURRENT_TIMESTAMP, ";
+		$table_flagged .= "reason text, ";
+		$table_flagged .= "addr varchar(200) default NULL, ";
+		$table_flagged .= "PRIMARY KEY (keyword) ";
+		$table_flagged .= ") ENGINE=MyISAM DEFAULT CHARSET=latin1;";
+		$tables = $ydb->query($table_flagged);
+
+		yourls_update_option('compliance_init', time());
+		$init = yourls_get_option('compliance_init');
+		if ($init === false) {
+			die("Unable to properly enable Compliance due an apparent problem with the database.");
+		}
+	}
+}
+// Delete table when plugin is deactivated - comment out to save flag data
+yourls_add_action('deactivated_compliance/plugin.php', 'compliance_deactivate');
+function compliance_deactivate() {
+	$compliance_table_drop = yourls_get_option('compliance_table_drop');
+	if ( $compliance_table_drop !== 'false' ) {
+		global $ydb;
+	
+		$init = yourls_get_option('compliance_init');
+		if ($init !== false) {
+			yourls_delete_option('compliance_init');
+			$ydb->query("DROP TABLE IF EXISTS flagged");
+		}
+	}
+}
+
+// Flush Tables
+function compliance_db_flush() {
+	global $ydb;
+
+	$table = 'flagged';
+	$init_1 = yourls_get_option('compliance_init');
+
+	if ($init_1 !== false) {
+		$ydb->query("TRUNCATE TABLE `$table`");
+		yourls_update_option('compliance_init', time());
+		$init_2 = yourls_get_option('compliance_init');
+		if ($init_2 === false || $init_1 == $init_2) {
+			die("Unable to properly reset the database. Contact your sys admin");
+		}
+	}
+}
+/*
+ *
+ *	FS IO
+ *
+ *
+*/
+yourls_add_action( 'delete_link', 'delete_flagged_link_by_keyword' );
+function delete_flagged_link_by_keyword( $args ) {
+	global $ydb;
+
+    	$keyword = $args[0]; // Keyword to delete
+
+	// Delete the flag data, no need for it anymore
+	$ftable = "flagged";
+	$ydb->query("DELETE FROM `$ftable` WHERE `keyword` = '$keyword';");
+
+	// Uncomment to delete log-entries for deleted URL
+	$ltable = YOURLS_DB_TABLE_LOG;
+	$ydb->query("DELETE FROM `$ltable` WHERE `shorturl` = '$keyword';");
 }
 ?>
