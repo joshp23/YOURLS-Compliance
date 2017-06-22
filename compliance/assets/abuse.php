@@ -1,6 +1,6 @@
 <?php
 // Compliance plugin for Yourls - URL Shortener ~ Complaint report page
-// Copyright (c) 2016, Josh Panter <joshu@unfettered.net>
+// Copyright (c) 2016 - 2017, Josh Panter <joshu@unfettered.net>
 //
 // Make sure we're in YOURLS context
 if( !defined( 'YOURLS_ABSPATH' ) ) {
@@ -16,7 +16,13 @@ if( !defined( 'YOURLS_ABSPATH' ) ) {
 
 <?php 
 	die();
-	} 
+}
+// Autofill abuse form - integration with other plugins
+if( isset($_GET['action']) && $_GET['action'] == "autofill" ) {
+	if( isset($_GET['alias'])) $alias = $_GET['alias'];
+	if( isset($_GET['reason'])) $reason = $_GET['reason'];
+	if( isset($_GET['contact'])) $contact = $_GET['contact'];
+}
 ?>
 <!--- In path, resume --->
 <html lang="en">

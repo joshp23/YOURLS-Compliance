@@ -1,11 +1,15 @@
 # Compliance for YOURLS
 An anti-abuse plugin written for and tested with YOURLS 1.7.1
 
-By Josh Panter [Unfettered](https://unfettered.net). See it in action at [0=2](https://0eq2.com/) - An Unfettered URL Shortening Service
+By Josh Panter [Unfettered](https://unfettered.net). See it in action at [0=2](https://0eq2.com)
 
-Compliance is designed to address link complaints from 3rd parties by implementing a flag-list which can be updated via the admin interface or via an optional public report-page. This allows any visitor to complain about a potentially abusive URL, which is then marked in the admin section and all future visitors are given the option to either continue through or avoid the link at their discretion.
+### Use
+Compliance addresses potential link complaints from 3rd parties via a flag-list which can be updated via the admin interface or via an optional public report-page, allowing any visitor to complain about a potentially abusive URL. The URL is then marked in the admin section and all future visitors are given the option to avoid the link.
 
-Compliance has seamless integration with the [Snapshot](https://github.com/joshp23/YOURLS-Snapshot) Visual Preview plugin. If Snapshot is installed, properly configured, and enabled, then Compliance will attempt to present a snapshot image of the flagged website upon interception.
+### Integration
+-  The Complaince abuse page is able to accept GET information to automatically fill out the complaint form from any plugin or arbitrary source. The Snapshot plugin makes use of this feature.
+-  [Snapshot](https://github.com/joshp23/YOURLS-Snapshot) Visual Preview plugin: If Snapshot is properly installed then Compliance will attempt to present a snapshot image of flagged websites upon interception.
+-  [Phishtank-2.0]() anti-phishing plugin: If a previously 'safe' link fails a recheck on redirection it can be intercepted and flagged in the Compliance database.
 
 Compliance is highly customizable. You can set the following options in the admin section of YOURLS:
 
@@ -17,7 +21,7 @@ Compliance is highly customizable. You can set the following options in the admi
 
 The default interecept and abuse report pages are both written with Bootstrap.
 
-## REQUIREMENTS
+### REQUIREMENTS
 
 1. A working [YOURLS](https://github.com/YOURLS/YOURLS) installation
 2. YOURLS mysql user should have CREATE TABLE grants on YOURLS database. See NOTE.
@@ -27,11 +31,8 @@ The default interecept and abuse report pages are both written with Bootstrap.
 1. Place the compliance folder in YOURLS/user/plugins
 2. Activate Compliance for Yourls in the Admin interface - sql tables should be made automatically
 3. Set options in the Compliance options page. The default options are just fine. Clicking submit on various forms will enter the default values into the sql tables, but null values all fall back to default actions as well.
-4. Link abuse.php to the pages/ directory. From YOURLS base directory:
-
-	```bash
-  $ ln -s ./user/plugins/compliance/assets/abuse.php ./pages/abuse.php
-  ```
+4. Link abuse.php to the pages/ directory. From YOURLS base directory:  
+    `$ ln -s ./user/plugins/compliance/assets/abuse.php ./pages/abuse.php`
  
 #### NOTE: The sql table may need to be added manually using compliance.sql located in compliance/assets/. 
 
@@ -51,7 +52,7 @@ Scripts used for inspiration and/or copypasta:
 
 ===========================
 
-    Copyright (C) 2016 Josh Panter
+    Copyright (C) 2016 - 2017 Josh Panter
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
