@@ -9,7 +9,7 @@ Compliance addresses potential link complaints from 3rd parties via a flag-list 
 ### Integration
 -  The Complaince abuse page is able to accept GET information to automatically fill out the complaint form from any plugin or arbitrary source. The Snapshot plugin makes use of this feature.
 -  [Snapshot](https://github.com/joshp23/YOURLS-Snapshot) Visual Preview plugin: If Snapshot is properly installed then Compliance will attempt to present a snapshot image of flagged websites upon interception.
--  [Phishtank-2.0]() anti-phishing plugin: If a previously 'safe' link fails a recheck on redirection it can be intercepted and flagged in the Compliance database.
+-  [Phishtank-2.0](https://github.com/joshp23/YOURLS-Phishtank-2.0) anti-phishing plugin: If a previously 'safe' link fails a recheck on redirection it can be intercepted and flagged in the Compliance database.
 
 Compliance is highly customizable. You can set the following options in the admin section of YOURLS:
 
