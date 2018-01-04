@@ -3,7 +3,7 @@
 Plugin Name: Compliance
 Plugin URI: https://github.com/joshp23/YOURLS-Compliance
 Description: Provides a way to flag short urls for abuse, and warn users of potential risk.
-Version: 1.3.0
+Version: 1.3.1
 Author: Josh Panter
 Author URI: https://unfettered.net
 */
@@ -295,7 +295,10 @@ function check_flagpage($url, $keyword='') {
 
 	// Safety check: Was the url flagged?
 	$table = 'flagged';
-	$flagged = $ydb->get_row("SELECT * FROM `$table` WHERE `keyword` = '$keyword'");
+	$sql = "SELECT * FROM $table WHERE `keyword` = :keyword";
+	$binds = array('keyword' => $keyword);
+	$flagged = $ydb->fetchOne($sql, $binds);
+
 	if( $flagged ) {
 
 		// A hit was found. Check for nuke
