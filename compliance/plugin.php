@@ -3,7 +3,7 @@
 Plugin Name: Compliance
 Plugin URI: https://github.com/joshp23/YOURLS-Compliance
 Description: Provides a way to flag short urls for abuse, and warn users of potential risk.
-Version: 1.3.1
+Version: 1.3.2
 Author: Josh Panter
 Author URI: https://unfettered.net
 */
@@ -106,7 +106,8 @@ function flag_list() {
 		
 		// populate table rows with flag data if there is any
 		$table = 'flagged';
-		$flagged_list = $ydb->get_results("SELECT * FROM `$table` ORDER BY timestamp DESC");
+		$sql = "SELECT * FROM `$table` ORDER BY timestamp DESC";
+		$flagged_list = $ydb->fetchObjects($sql);
 		$found_rows = false;
 		if($flagged_list) {
 			$found_rows = true;
@@ -143,18 +144,22 @@ HTML;
 
 // Display page 0.2 - adding a flag
 function flag_add() {
-	global $ydb;
 	
 	if (!empty($_POST) && isset($_POST['alias']) && isset($_POST['reason']) && isset($_POST['contact'])) {
 
-		$table = "flagged";
-		$alias = $_POST['alias'];
-		$reason = $_POST['reason'];
-		$contact = $_POST['contact'];
-
 		if (yourls_keyword_is_taken( $alias ) == true) {
+			global $ydb;
+			$table = "flagged";
+			$alias = $_POST['alias'];
+			$reason = $_POST['reason'];
+			$contact = $_POST['contact'];
+			$binds = array( 'alias' => $alias,
+							'reason' => $reason,
+							'contact' => $contact);
+							
+			$sql = "REPLACE INTO `$table` (keyword, reason, addr) VALUES (:alias, :reason, :contact)";
+			$insert = $ydb->fetchAffected($sql, $binds);
 
-			$insert = $ydb->query("REPLACE INTO `$table` (keyword, reason, addr) VALUES ('$alias', '$reason', '$contact')");
 		} else {
 		echo '<h3 style="color:red">ERROR: No such URL in our database. Please try again.</h3>';
 		}
@@ -165,15 +170,16 @@ function flag_add() {
 
 // Display page 0.3 - removing a flag
 function remove_flag() {
-	global $ydb;
 
 	if( isset($_GET['key']) ) {
+		global $ydb;
 		$table = 'flagged';
-		// @@@FIXME@@@ needs securing against SQL injection !
 		$key = $_GET['key'];
-        	$delete = $ydb->query("DELETE FROM `$table` WHERE keyword='$key'");
+		$binds = array( 'key' => $key);
+						
+		$sql = "DELETE FROM `$table` WHERE keyword=:key";
+		$delete = $ydb->fetchAffected($sql, $binds);
 	}
-	// @@@FIXME@@@ This should probably be rewritten to do a redirect to avoid confusion between GET/POST forms
 	flag_list();
 }
 
@@ -265,7 +271,6 @@ yourls_add_action( 'redirect_shorturl', 'check_safe_redirection' );
 
 // Flag check 0 ~ skelleton and flow
 function check_safe_redirection( $args ) {
-	global $ydb;
 
         $url = $args[0]; // Target URL to scan
         $keyword = $args[1]; // Keyword for this request
@@ -382,14 +387,13 @@ function compliance_snapshot_preview($keyword, $url) {
  *
  *
 */
-// Create tables for this plugin when activated
+// Create tables for this plugin when activatedydb
 yourls_add_action( 'activated_compliance/plugin.php', 'compliance_activated' );
 function compliance_activated() {
 
-	global $ydb;
-
 	$init = yourls_get_option('compliance_init');
 	if ($init === false) {
+		global $ydb;
 		// Create the init value
 		yourls_add_option('compliance_init', time());
 		// Create the flag table
@@ -401,7 +405,7 @@ function compliance_activated() {
 		$table_flagged .= "addr varchar(200) default NULL, ";
 		$table_flagged .= "PRIMARY KEY (keyword) ";
 		$table_flagged .= ") ENGINE=MyISAM DEFAULT CHARSET=latin1;";
-		$tables = $ydb->query($table_flagged);
+		$tables = $ydb->fetchAffected($table_flagged);
 
 		yourls_update_option('compliance_init', time());
 		$init = yourls_get_option('compliance_init');
@@ -415,25 +419,26 @@ yourls_add_action('deactivated_compliance/plugin.php', 'compliance_deactivate');
 function compliance_deactivate() {
 	$compliance_table_drop = yourls_get_option('compliance_table_drop');
 	if ( $compliance_table_drop !== 'false' ) {
-		global $ydb;
-	
 		$init = yourls_get_option('compliance_init');
 		if ($init !== false) {
 			yourls_delete_option('compliance_init');
-			$ydb->query("DROP TABLE IF EXISTS flagged");
+			global $ydb;
+			$table = 'flagged';
+			$sql = "DROP TABLE IF EXISTS $table";
+			$ydb->fetchAffected($sql);
 		}
 	}
 }
 
 // Flush Tables
 function compliance_db_flush() {
-	global $ydb;
-
-	$table = 'flagged';
 	$init_1 = yourls_get_option('compliance_init');
-
 	if ($init_1 !== false) {
-		$ydb->query("TRUNCATE TABLE `$table`");
+		global $ydb;
+		$table = 'flagged';
+		$sql = "TRUNCATE TABLE $table";
+		$ydb->fetchAffected($sql);
+
 		yourls_update_option('compliance_init', time());
 		$init_2 = yourls_get_option('compliance_init');
 		if ($init_2 === false || $init_1 == $init_2) {
@@ -451,14 +456,18 @@ yourls_add_action( 'delete_link', 'delete_flagged_link_by_keyword' );
 function delete_flagged_link_by_keyword( $args ) {
 	global $ydb;
 
-    	$keyword = $args[0]; // Keyword to delete
+	$keyword = $args[0]; // Keyword to delete
 
 	// Delete the flag data, no need for it anymore
 	$ftable = "flagged";
-	$ydb->query("DELETE FROM `$ftable` WHERE `keyword` = '$keyword';");
+	$binds = array( 'keyword' => $keyword);
+	$sql = "DELETE FROM $ftable WHERE `keyword` = :keyword";
+	$ydb->fetchAffected($sql, $binds);
 
 	// Uncomment to delete log-entries for deleted URL
 	$ltable = YOURLS_DB_TABLE_LOG;
-	$ydb->query("DELETE FROM `$ltable` WHERE `shorturl` = '$keyword';");
+	$binds = array( 'keyword' => $keyword);
+	$sql = "DELETE FROM $ltable WHERE `shorturl` = :keyword";
+	$ydb->fetchAffected($sql, $binds);
 }
 ?>

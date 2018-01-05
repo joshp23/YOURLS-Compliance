@@ -1,6 +1,6 @@
 <?php
 // Compliance plugin for Yourls - URL Shortener ~ Complaint report page
-// Copyright (c) 2016 - 2017, Josh Panter <joshu@unfettered.net>
+// Copyright (c) 2016 - 2018, Josh Panter <joshu@unfettered.net>
 //
 // Make sure we're in YOURLS context
 if( !defined( 'YOURLS_ABSPATH' ) ) {
@@ -89,12 +89,16 @@ if( isset($_GET['action']) && $_GET['action'] == "autofill" ) {
 
 			// If there are no errors, submit the report
 			if (!$errAlias && !$errReason && !$errContact) {
-				global $ydb;
-				$table = "flagged";
 
 				if (yourls_keyword_is_taken( $alias ) == true) {
-
-					$insert = $ydb->query("REPLACE INTO `$table` (keyword, reason, addr) VALUES ('$alias', '$reason', '$contact')");
+					global $ydb;
+					$table = "flagged";
+					$binds = array( 'alias' => $alias,
+									'reason' => $reason,
+									'contact' => $contact);
+							
+					$sql = "REPLACE INTO `$table` (keyword, reason, addr) VALUES (:alias, :reason, :contact)";
+					$insert = $ydb->fetchAffected($sql, $binds);
 					$result = "
 					<div class='alert alert-dismissible alert-success'>
 						<strong>Success</strong> <b>http://$_SERVER[HTTP_HOST]/$alias</b> has been flagged. <a href='https://$_SERVER[HTTP_HOST]'>Click here</a> to return to the main page.
