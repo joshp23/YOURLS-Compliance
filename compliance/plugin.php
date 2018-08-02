@@ -96,7 +96,7 @@ function compliance_do_page() {
 // Display page 0.01 - maybe insert some JS and CSS files to head
 yourls_add_action( 'html_head', 'compliance_head' );
 function compliance_head() {
-	if ( YOURLS_JP23_HEAD_FILES == false || YOURLS_JP23_HEAD_FILES == null ) {
+	if ( YOURLS_JP23_HEAD_FILES == !true ) {
 
 		define( 'YOURLS_JP23_HEAD_FILES', true );
 
