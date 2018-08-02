@@ -3,7 +3,7 @@
 Plugin Name: Compliance
 Plugin URI: https://github.com/joshp23/YOURLS-Compliance
 Description: Provides a way to flag short urls for abuse, and warn users of potential risk.
-Version: 1.3.2
+Version: 1.3.3
 Author: Josh Panter
 Author URI: https://unfettered.net
 */
@@ -93,6 +93,20 @@ function compliance_do_page() {
 	compliance_flag_list_mgr(); // sys
 }
 
+// Display page 0.01 - maybe insert some JS and CSS files to head
+yourls_add_action( 'html_head', 'compliance_head' );
+function compliance_head() {
+	if ( YOURLS_JP23_HEAD_FILES == false || YOURLS_JP23_HEAD_FILES == null ) {
+
+		define( 'YOURLS_JP23_HEAD_FILES', true );
+
+		echo "\n<! --------------------------JP23_HEAD_FILES Start-------------------------- >\n";
+		echo "<link rel=\"stylesheet\" href=\"/css/infos.css\" type=\"text/css\" media=\"screen\" />\n";
+		echo "<script src=\"/js/infos.js\" type=\"text/javascript\"></script>\n";
+		echo "<! --------------------------JP23_HEAD_FILES END---------------------------- >\n";
+
+	}
+}
 // Display page 0.1 - listing the flags !IF NO NUKES!
 function flag_list() {
 	// should we bother with this data, has the "nuke" option been set?"

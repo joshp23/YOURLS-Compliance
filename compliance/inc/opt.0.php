@@ -5,9 +5,6 @@
 // No direct call
 if( !defined( 'YOURLS_ABSPATH' ) ) die();
 ?>
-	<link rel="stylesheet" href="/css/infos.css?v=1.7.2" type="text/css" media="screen" />
-	<script src="/js/infos.js?v=1.7.2" type="text/javascript"></script>
-
 	<div id="wrap">
 		<div id="tabs">
 
