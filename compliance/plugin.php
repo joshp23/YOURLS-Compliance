@@ -3,7 +3,7 @@
 Plugin Name: Compliance
 Plugin URI: https://github.com/joshp23/YOURLS-Compliance
 Description: Provides a way to flag short urls for abuse, and warn users of potential risk.
-Version: 1.3.4
+Version: 1.3.5
 Author: Josh Panter
 Author URI: https://unfettered.net
 */
@@ -98,13 +98,11 @@ yourls_add_action( 'html_head', 'compliance_head' );
 function compliance_head() {
 	if ( YOURLS_JP23_HEAD_FILES == null ) {
 		define( 'YOURLS_JP23_HEAD_FILES', true );
-		<script src="<?php yourls_site_url(); ?>/js/yada.js?v=<?php echo YOURLS_VERSION; ?>" type="text/javascript"></script>
-		?>
-		<! --------------------------JP23_HEAD_FILES Start-------------------------- >
-		<link rel="stylesheet" href="<?php yourls_site_url(); ?>/css/infos.css?v=<?php echo YOURLS_VERSION; ?>" type="text/css" media="screen" />
-		<script src="<?php yourls_site_url(); ?>/js/infos.js?v=<?php echo YOURLS_VERSION; ?>" type="text/javascript"></script>
-		<! --------------------------JP23_HEAD_FILES END---------------------------- >
-		<?php
+
+		echo "\n<! --------------------------JP23_HEAD_FILES Start-------------------------- >\n";
+		echo "<link rel=\"stylesheet\" href=\"".yourls_site_url()."/css/infos.css".YOURLS_VERSION."\" type=\"text/css\" media=\"screen\" />\n";
+		echo "<script src=\"".yourls_site_url()."/js/infos.js".YOURLS_VERSION."\" type=\"text/javascript\"></script>\n";
+		echo "<! --------------------------JP23_HEAD_FILES END---------------------------- >\n";
 	}
 }
 // Display page 0.1 - listing the flags !IF NO NUKES!
