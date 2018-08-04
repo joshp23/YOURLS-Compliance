@@ -100,8 +100,8 @@ function compliance_head() {
 		define( 'YOURLS_JP23_HEAD_FILES', true );
 
 		echo "\n<! --------------------------JP23_HEAD_FILES Start-------------------------- >\n";
-		echo "<link rel=\"stylesheet\" href=\"".yourls_site_url()."/css/infos.css".YOURLS_VERSION."\" type=\"text/css\" media=\"screen\" />\n";
-		echo "<script src=\"".yourls_site_url()."/js/infos.js".YOURLS_VERSION."\" type=\"text/javascript\"></script>\n";
+		echo "<link rel=\"stylesheet\" href=\"".yourls_site_url()."/css/infos.css?v=".YOURLS_VERSION."\" type=\"text/css\" media=\"screen\" />\n";
+		echo "<script src=\"".yourls_site_url()."/js/infos.js?v=".YOURLS_VERSION."\" type=\"text/javascript\"></script>\n";
 		echo "<! --------------------------JP23_HEAD_FILES END---------------------------- >\n";
 	}
 }
@@ -337,7 +337,7 @@ function display_flagpage($keyword, $reason) {
 
 	$title 		= yourls_get_keyword_title( $keyword );
 	$url		= yourls_get_keyword_longurl( $keyword );
-	$base		= YOURLS_SITE;
+	$base		= yourls_site_url();
 	$img		= yourls_plugin_url( dirname( __FILE__ ).'/assets/caution.png' );
 	$css 		= yourls_plugin_url( dirname( __FILE__ ).'/assets/bootstrap.min.css' );
 	
@@ -373,7 +373,7 @@ function display_flagpage($keyword, $reason) {
 // Flag check 0.4 ~ image preview
 function compliance_snapshot_preview($keyword, $url) {
 
-	$base 	= YOURLS_SITE;
+	$base 	= yourls_site_url();
 	$id 	= 'snapshot';
 	$fn 	= snapshot_request($keyword, $url);
 	
