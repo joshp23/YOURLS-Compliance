@@ -93,12 +93,16 @@ if( isset($_GET['action']) && $_GET['action'] == "autofill" ) {
 				if (yourls_keyword_is_taken( $alias ) == true) {
 					global $ydb;
 					$table = "flagged";
-					$binds = array( 'alias' => $alias,
-									'reason' => $reason,
-									'contact' => $contact);
-							
-					$sql = "REPLACE INTO `$table` (keyword, reason, addr) VALUES (:alias, :reason, :contact)";
-					$insert = $ydb->fetchAffected($sql, $binds);
+					if (version_compare(YOURLS_VERSION, '1.7.3') >= 0) {
+						$binds = array( 'alias' => $alias,
+										'reason' => $reason,
+										'contact' => $contact);
+								
+						$sql = "REPLACE INTO `$table` (keyword, reason, addr) VALUES (:alias, :reason, :contact)";
+						$insert = $ydb->fetchAffected($sql, $binds);
+					} else {
+						$insert = $ydb->query("REPLACE INTO `$table` (keyword, reason, addr) VALUES ('$alias', '$reason', '$contact')");
+					}
 					$result = "
 					<div class='alert alert-dismissible alert-success'>
 						<strong>Success</strong> <b>http://$_SERVER[HTTP_HOST]/$alias</b> has been flagged. <a href='https://$_SERVER[HTTP_HOST]'>Click here</a> to return to the main page.
