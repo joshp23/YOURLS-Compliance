@@ -158,7 +158,7 @@ function flag_add() {
 	
 	if (!empty($_POST) && isset($_POST['alias']) && isset($_POST['reason']) && isset($_POST['contact'])) {
 
-		if (yourls_keyword_is_taken( $alias ) == true) {
+		if (yourls_keyword_is_free( $alias ) == false) {
 			global $ydb;
 			$table = "flagged";
 			$alias = $_POST['alias'];
