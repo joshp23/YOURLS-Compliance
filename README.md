@@ -1,7 +1,5 @@
 # Compliance for YOURLS
-An anti-abuse plugin written for and tested with YOURLS 1.7.1
-
-By Josh Panter [Unfettered](https://unfettered.net). See it in action at [0=2](https://0eq2.com)
+An anti-abuse plugin written for YOURLS
 
 ### Use
 Compliance addresses potential link complaints from 3rd parties via a flag-list which can be updated via the admin interface or via an optional public report-page, allowing any visitor to complain about a potentially abusive URL. The URL is then marked in the admin section and all future visitors are given the option to avoid the link.
