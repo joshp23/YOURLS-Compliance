@@ -7,7 +7,6 @@ Version: 1.6.2
 Author: Josh Panter
 Author URI: https://unfettered.net
 */
-define( 'COMPLIANCE_DB_UPDATE', false );
 // No direct call
 if( !defined( 'YOURLS_ABSPATH' ) ) die();
 /*
@@ -394,6 +393,8 @@ function compliance_snapshot_preview($keyword, $url) {
 */
 
 // temporary update DB script
+if (!defined( 'COMPLIANCE_DB_UPDATE' ))
+	define( 'COMPLIANCE_DB_UPDATE', false );
 if (COMPLIANCE_DB_UPDATE)
 	yourls_add_action( 'plugins_loaded', 'compliance_update_DB' );
 function compliance_update_DB () {

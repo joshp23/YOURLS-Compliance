@@ -34,7 +34,7 @@ The default interecept and abuse report pages are both written with Bootstrap.
  
 #### NOTES: 
 - The sql table may need to be added manually using compliance.sql located in compliance/assets/. 
-- set `define( 'COMPLIANCE_DB_UPDATE', false );` to `true` to update DB from versions earlier than 1.5.0
+- set `define( 'COMPLIANCE_DB_UPDATE', true );` in `config.php` in order to update DB from versions earlier than 1.5.0. After one page load delte this option.
 
 ### WON'T DO: 
 1. Flagged links need to be sanitized against known blacklists (ex: GSB, etc.) and deleted. This is not a part of the current release, as other plugins, such as [Phishtank-2.0](https://github.com/joshp23/YOURLS-Phishtank-2.0), can check blacklists before link submissionn and recheck them on redirects. It is highly reccomended that one of the existing blacklist plugins be used.
@@ -57,7 +57,7 @@ All of my published code is developed and maintained in spare time, if you would
 
 ===========================
 
-    Copyright (C) 2016 - 2017 Josh Panter
+    Copyright (C) 2016 Josh Panter
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
