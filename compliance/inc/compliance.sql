@@ -5,5 +5,5 @@ CREATE TABLE IF NOT EXISTS `flagged` (
   `reason` text,
   `addr` varchar(200) default NULL,
   PRIMARY KEY  (`keyword`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
