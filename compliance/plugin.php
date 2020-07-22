@@ -3,7 +3,7 @@
 Plugin Name: Compliance
 Plugin URI: https://github.com/joshp23/YOURLS-Compliance
 Description: Provides a way to flag short urls for abuse, and warn users of potential risk.
-Version: 1.4.2
+Version: 1.5.0
 Author: Josh Panter
 Author URI: https://unfettered.net
 */
@@ -113,12 +113,8 @@ function flag_list() {
 		// populate table rows with flag data if there is any
 		global $ydb;
 		$table = 'flagged';
-		if (version_compare(YOURLS_VERSION, '1.7.3') >= 0) {
-			$sql = "SELECT * FROM `$table` ORDER BY timestamp DESC";
-			$flagged_list = $ydb->fetchObjects($sql);
-		} else {
-			$flagged_list = $ydb->get_results("SELECT * FROM `$table` ORDER BY timestamp DESC");
-		}
+		$sql = "SELECT * FROM `$table` ORDER BY timestamp DESC";
+		$flagged_list = $ydb->fetchObjects($sql);
 		$found_rows = false;
 		if($flagged_list) {
 			$found_rows = true;
@@ -163,16 +159,12 @@ function flag_add() {
 			$table = "flagged";
 			$reason = $_POST['reason'];
 			$contact = $_POST['contact'];
-			if (version_compare(YOURLS_VERSION, '1.7.3') >= 0) {
-				$binds = array( 'alias' => $alias,
-								'reason' => $reason,
-								'contact' => $contact);
-								
-				$sql = "REPLACE INTO `$table` (keyword, reason, addr) VALUES (:alias, :reason, :contact)";
-				$insert = $ydb->fetchAffected($sql, $binds);
-			} else {
-				$insert = $ydb->query("REPLACE INTO `$table` (keyword, reason, addr) VALUES ('$alias', '$reason', '$contact')");
-			}
+			$binds = array( 'alias' => $alias,
+							'reason' => $reason,
+							'contact' => $contact);
+							
+			$sql = "REPLACE INTO `$table` (keyword, reason, addr) VALUES (:alias, :reason, :contact)";
+			$insert = $ydb->fetchAffected($sql, $binds);
 
 		} else {
 		echo '<h3 style="color:red">ERROR: No such URL in our database. Please try again.</h3>';
@@ -189,14 +181,10 @@ function remove_flag() {
 		global $ydb;
 		$table = 'flagged';
 		$key = $_GET['key'];
-		if (version_compare(YOURLS_VERSION, '1.7.3') >= 0) {
-			$binds = array( 'key' => $key);
-							
-			$sql = "DELETE FROM `$table` WHERE keyword=:key";
-			$delete = $ydb->fetchAffected($sql, $binds);
-		} else {
-			$delete = $ydb->query("DELETE FROM `$table` WHERE keyword='$key'");
-		}
+		$binds = array( 'key' => $key);
+						
+		$sql = "DELETE FROM `$table` WHERE keyword=:key";
+		$delete = $ydb->fetchAffected($sql, $binds);
 	}
 	flag_list();
 }
@@ -318,16 +306,10 @@ function check_flagpage($url, $keyword='') {
 
 	// Safety check: Was the url flagged?
 	$table = 'flagged';
-	if (version_compare(YOURLS_VERSION, '1.7.3') >= 0) {
-		$sql = "SELECT * FROM $table WHERE `keyword` = :keyword";
-		$binds = array('keyword' => $keyword);
-		$flagged = $ydb->fetchOne($sql, $binds);
-	} else {
-		$flagged = $ydb->get_row("SELECT * FROM `$table` WHERE `keyword` = '$keyword'");
-	}
-
+	$sql = "SELECT * FROM $table WHERE `keyword` = :keyword";
+	$binds = array('keyword' => $keyword);
+	$flagged = $ydb->fetchOne($sql, $binds);
 	if( $flagged ) {
-
 		// A hit was found. Check for nuke
 		$compliance_nuke = yourls_get_option( 'compliance_nuke' );
 		if ($compliance_nuke == "true") {
@@ -345,7 +327,7 @@ function check_flagpage($url, $keyword='') {
 // Flag check 0.2 ~ interstitial warning TEMPLATE
 function display_flagpage($keyword, $reason) {
 
-	$title 		= yourls_get_keyword_title( $keyword );
+	$title 	= yourls_get_keyword_title( $keyword );
 	$url		= yourls_get_keyword_longurl( $keyword );
 	$base		= YOURLS_SITE;
 	$img		= yourls_plugin_url( dirname( __FILE__ ).'/assets/caution.png' );
@@ -363,7 +345,7 @@ function display_flagpage($keyword, $reason) {
 	$vars = array();
 		$vars['keyword'] 	= $keyword;
 		$vars['reason'] 	= $reason;
-		$vars['title'] 		= $title;
+		$vars['title'] 	= $title;
 		$vars['url'] 		= $url;
 		$vars['base'] 		= $base;
 		$vars['img'] 		= $img;
@@ -409,7 +391,23 @@ function compliance_snapshot_preview($keyword, $url) {
  *
  *
 */
+yourls_add_action( 'plugins_loaded', 'compliance_update_DB' );
 // Create tables for this plugin when activatedydb
+function compliance_update_DB () {
+	global $ydb;
+	$table = 'flagged';
+    	$sql = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES
+    		WHERE TABLE_NAME = '".$table."'
+    		AND ENGINE = 'MyISAM' LIMIT 1";
+	$results = $ydb->fetchObjects($sql);
+	if($results) {
+		foreach( $results as $result ) {
+			$fix = "ALTER TABLE `".$table."` ENGINE = INNODB;";
+			$ydb->fetchAffected($fix);
+		}
+	}
+}
+
 yourls_add_action( 'activated_compliance/plugin.php', 'compliance_activated' );
 function compliance_activated() {
 
@@ -426,13 +424,9 @@ function compliance_activated() {
 		$table_flagged .= "reason text, ";
 		$table_flagged .= "addr varchar(200) default NULL, ";
 		$table_flagged .= "PRIMARY KEY (keyword) ";
-		$table_flagged .= ") ENGINE=MyISAM DEFAULT CHARSET=latin1;";
+		$table_flagged .= ") ENGINE=InnoDB DEFAULT CHARSET=latin1;";
 
-		if (version_compare(YOURLS_VERSION, '1.7.3') >= 0) {
-			$tables = $ydb->fetchAffected($table_flagged);
-		} else  {
-			$tables = $ydb->query($table_flagged); 
-		}
+		$tables = $ydb->fetchAffected($table_flagged);
 
 		yourls_update_option('compliance_init', time());
 		$init = yourls_get_option('compliance_init');
@@ -451,12 +445,8 @@ function compliance_deactivate() {
 			yourls_delete_option('compliance_init');
 			global $ydb;
 			$table = 'flagged';
-			if (version_compare(YOURLS_VERSION, '1.7.3') >= 0) {
-				$sql = "DROP TABLE IF EXISTS `$table`";
-				$ydb->fetchAffected($sql);
-			} else {
-				$ydb->query("DROP TABLE IF EXISTS `$table`");
-			}
+			$sql = "DROP TABLE IF EXISTS `$table`";
+			$ydb->fetchAffected($sql);
 		}
 	}
 }
@@ -467,12 +457,8 @@ function compliance_db_flush() {
 	if ($init_1 !== false) {
 		global $ydb;
 		$table = 'flagged';
-		if (version_compare(YOURLS_VERSION, '1.7.3') >= 0) {
-			$sql = "TRUNCATE TABLE `$table`";
-			$ydb->fetchAffected($sql);
-		} else {
-			$ydb->query("TRUNCATE TABLE `$table`");
-		}
+		$sql = "TRUNCATE TABLE `$table`";
+		$ydb->fetchAffected($sql);
 
 		yourls_update_option('compliance_init', time());
 		$init_2 = yourls_get_option('compliance_init');
@@ -495,22 +481,14 @@ function delete_flagged_link_by_keyword( $args ) {
 
 	// Delete the flag data, no need for it anymore
 	$ftable = "flagged";
-	if (version_compare(YOURLS_VERSION, '1.7.3') >= 0) {
-		$binds = array( 'keyword' => $keyword);
-		$sql = "DELETE FROM $ftable WHERE `keyword` = :keyword";
-		$ydb->fetchAffected($sql, $binds);
-	} else {
-		$ydb->query("DELETE FROM `$ftable` WHERE `keyword` = '$keyword';");
-	}
+	$binds = array( 'keyword' => $keyword);
+	$sql = "DELETE FROM $ftable WHERE `keyword` = :keyword";
+	$ydb->fetchAffected($sql, $binds);
 
 	// Uncomment to delete log-entries for deleted URL
 	$ltable = YOURLS_DB_TABLE_LOG;
-	if (version_compare(YOURLS_VERSION, '1.7.3') >= 0) {
-		$binds = array( 'keyword' => $keyword);
-		$sql = "DELETE FROM $ltable WHERE `shorturl` = :keyword";
-		$ydb->fetchAffected($sql, $binds);
-	} else {
-		$ydb->query("DELETE FROM `$ltable` WHERE `shorturl` = '$keyword';");
-	}
+	$binds = array( 'keyword' => $keyword);
+	$sql = "DELETE FROM $ltable WHERE `shorturl` = :keyword";
+	$ydb->fetchAffected($sql, $binds);
 }
 ?>
