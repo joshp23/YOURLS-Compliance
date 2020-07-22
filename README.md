@@ -32,7 +32,9 @@ The default interecept and abuse report pages are both written with Bootstrap.
 4. Link abuse.php to the pages/ directory. From YOURLS base directory:  
     `$ ln -s ./user/plugins/compliance/assets/abuse.php ./pages/abuse.php`
  
-#### NOTE: The sql table may need to be added manually using compliance.sql located in compliance/assets/. 
+#### NOTES: 
+- The sql table may need to be added manually using compliance.sql located in compliance/assets/. 
+- set `define( 'COMPLIANCE_DB_UPDATE', false );` to `true` to update DB from versions earlier than 1.5.0
 
 ### WON'T DO: 
 1. Flagged links need to be sanitized against known blacklists (ex: GSB, etc.) and deleted. This is not a part of the current release, as other plugins, such as [Phishtank-2.0](https://github.com/joshp23/YOURLS-Phishtank-2.0), can check blacklists before link submissionn and recheck them on redirects. It is highly reccomended that one of the existing blacklist plugins be used.

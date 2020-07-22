@@ -3,10 +3,11 @@
 Plugin Name: Compliance
 Plugin URI: https://github.com/joshp23/YOURLS-Compliance
 Description: Provides a way to flag short urls for abuse, and warn users of potential risk.
-Version: 1.6.1
+Version: 1.6.2
 Author: Josh Panter
 Author URI: https://unfettered.net
 */
+define( 'COMPLIANCE_DB_UPDATE', false );
 // No direct call
 if( !defined( 'YOURLS_ABSPATH' ) ) die();
 /*
@@ -393,7 +394,8 @@ function compliance_snapshot_preview($keyword, $url) {
 */
 
 // temporary update DB script
-yourls_add_action( 'plugins_loaded', 'compliance_update_DB' );
+if (COMPLIANCE_DB_UPDATE)
+	yourls_add_action( 'plugins_loaded', 'compliance_update_DB' );
 function compliance_update_DB () {
 	global $ydb;
 	$table = 'flagged';
