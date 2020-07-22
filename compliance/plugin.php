@@ -3,7 +3,7 @@
 Plugin Name: Compliance
 Plugin URI: https://github.com/joshp23/YOURLS-Compliance
 Description: Provides a way to flag short urls for abuse, and warn users of potential risk.
-Version: 1.5.0
+Version: 1.6.1
 Author: Josh Panter
 Author URI: https://unfettered.net
 */
@@ -112,7 +112,7 @@ function flag_list() {
 		echo $opt_1_view;
 		// populate table rows with flag data if there is any
 		global $ydb;
-		$table = 'flagged';
+		$table = YOURLS_DB_PREFIX . 'flagged';
 		$sql = "SELECT * FROM `$table` ORDER BY timestamp DESC";
 		$flagged_list = $ydb->fetchObjects($sql);
 		$found_rows = false;
@@ -156,7 +156,7 @@ function flag_add() {
 		$alias = $_POST['alias'];
 		if (yourls_keyword_is_taken( $alias ) == true) {
 			global $ydb;
-			$table = "flagged";
+			$table = YOURLS_DB_PREFIX . "flagged";
 			$reason = $_POST['reason'];
 			$contact = $_POST['contact'];
 			$binds = array( 'alias' => $alias,
@@ -179,7 +179,7 @@ function remove_flag() {
 
 	if( isset($_GET['key']) ) {
 		global $ydb;
-		$table = 'flagged';
+		$table = YOURLS_DB_PREFIX . 'flagged';
 		$key = $_GET['key'];
 		$binds = array( 'key' => $key);
 						
@@ -305,7 +305,7 @@ function check_flagpage($url, $keyword='') {
 	$result = false;
 
 	// Safety check: Was the url flagged?
-	$table = 'flagged';
+	$table = YOURLS_DB_PREFIX . 'flagged';
 	$sql = "SELECT * FROM $table WHERE `keyword` = :keyword";
 	$binds = array('keyword' => $keyword);
 	$flagged = $ydb->fetchOne($sql, $binds);
@@ -391,23 +391,35 @@ function compliance_snapshot_preview($keyword, $url) {
  *
  *
 */
+
+// temporary update DB script
 yourls_add_action( 'plugins_loaded', 'compliance_update_DB' );
-// Create tables for this plugin when activatedydb
 function compliance_update_DB () {
 	global $ydb;
 	$table = 'flagged';
-    	$sql = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES
-    		WHERE TABLE_NAME = '".$table."'
-    		AND ENGINE = 'MyISAM' LIMIT 1";
-	$results = $ydb->fetchObjects($sql);
-	if($results) {
-		foreach( $results as $result ) {
-			$fix = "ALTER TABLE `".$table."` ENGINE = INNODB;";
-			$ydb->fetchAffected($fix);
+	if ( YOURLS_DB_PREFIX ) {
+		try {
+			$sql = "DESCRIBE `".YOURLS_DB_PREFIX . $table."`";
+			$fix = $ydb->fetchAffected($sql);
+		} catch (PDOException $e) {
+			$sql = "RENAME TABLE `".$table."` TO  `".YOURLS_DB_PREFIX.$table."`";
+			$fix = $ydb->fetchAffected($sql);
 		}
+		
+		$table = YOURLS_DB_PREFIX . $table;
+	}
+	
+	try {
+	    	$sql = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES
+	    		WHERE TABLE_NAME = `".$table."`
+	    		AND ENGINE = 'INNODB' LIMIT 1";
+	    	$fix = $ydb->fetchAffected($sql);
+    	} catch (PDOException $e) {
+		$sql = "ALTER TABLE `".$table."` ENGINE = INNODB;";
+		$fix = $ydb->fetchAffected($sql);
 	}
 }
-
+// Create tables for this plugin when activatedydb
 yourls_add_action( 'activated_compliance/plugin.php', 'compliance_activated' );
 function compliance_activated() {
 
@@ -417,7 +429,8 @@ function compliance_activated() {
 		// Create the init value
 		yourls_add_option('compliance_init', time());
 		// Create the flag table
-		$table_flagged  = "CREATE TABLE IF NOT EXISTS flagged (";
+		$table = YOURLS_DB_PREFIX . 'flagged';
+		$table_flagged  = "CREATE TABLE IF NOT EXISTS ".$table." (";
 		$table_flagged .= "keyword varchar(200) NOT NULL, ";
 		$table_flagged .= "clicks int(10) NOT NULL default 0, ";
 		$table_flagged .= "timestamp timestamp NOT NULL default CURRENT_TIMESTAMP, ";
@@ -444,7 +457,7 @@ function compliance_deactivate() {
 		if ($init !== false) {
 			yourls_delete_option('compliance_init');
 			global $ydb;
-			$table = 'flagged';
+			$table = YOURLS_DB_PREFIX . 'flagged';
 			$sql = "DROP TABLE IF EXISTS `$table`";
 			$ydb->fetchAffected($sql);
 		}
@@ -456,7 +469,7 @@ function compliance_db_flush() {
 	$init_1 = yourls_get_option('compliance_init');
 	if ($init_1 !== false) {
 		global $ydb;
-		$table = 'flagged';
+		$table = YOURLS_DB_PREFIX . 'flagged';
 		$sql = "TRUNCATE TABLE `$table`";
 		$ydb->fetchAffected($sql);
 
@@ -480,7 +493,7 @@ function delete_flagged_link_by_keyword( $args ) {
 	$keyword = $args[0]; // Keyword to delete
 
 	// Delete the flag data, no need for it anymore
-	$ftable = "flagged";
+	$ftable = YOURLS_DB_PREFIX . "flagged";
 	$binds = array( 'keyword' => $keyword);
 	$sql = "DELETE FROM $ftable WHERE `keyword` = :keyword";
 	$ydb->fetchAffected($sql, $binds);
