@@ -6,6 +6,7 @@ Compliance addresses potential link complaints from 3rd parties via a flag-list 
 
 ### Integration
 -  The Complaince abuse page is able to accept GET information to automatically fill out the complaint form from any plugin or arbitrary source. The Snapshot plugin makes use of this feature.
+- The Compliance abuse page will embed [httpBL](https://github.com/joshp23/YOURLS-httpBL) Honeypots if that plugin is enabled and configured.
 -  [Snapshot](https://github.com/joshp23/YOURLS-Snapshot) Visual Preview plugin: If Snapshot is properly installed then Compliance will attempt to present a snapshot image of flagged websites upon interception.
 -  [Phishtank-2.0](https://github.com/joshp23/YOURLS-Phishtank-2.0) anti-phishing plugin: If a previously 'safe' link fails a recheck on redirection it can be intercepted and flagged in the Compliance database.
 
@@ -38,7 +39,6 @@ The default interecept and abuse report pages are both written with Bootstrap.
 
 ### WON'T DO: 
 1. Flagged links need to be sanitized against known blacklists (ex: GSB, etc.) and deleted. This is not a part of the current release, as other plugins, such as [Phishtank-2.0](https://github.com/joshp23/YOURLS-Phishtank-2.0), can check blacklists before link submissionn and recheck them on redirects. It is highly reccomended that one of the existing blacklist plugins be used.
-2. Project Honeypot's http:BL implimented in order to prevent acces from known abusers. This very necessary feature ~~needs to be~~ has already been turned into it's own entity, [here](https://github.com/joshp23/YOURLS-httpBL).
 
 ### TODO:
 Please see the [TODO](https://github.com/joshp23/YOURLS-Compliance/issues/10) list.

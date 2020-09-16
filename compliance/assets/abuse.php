@@ -1,7 +1,12 @@
 <?php
-// Compliance plugin for Yourls - URL Shortener ~ Complaint report page
-// Copyright (c) 2016 - 2018, Josh Panter <joshu@unfettered.net>
-//
+/*
+Plugin Name: Compliance | Report Page
+Plugin URI: https://github.com/joshp23/YOURLS-Compliance
+Description: Provides a way to flag short urls for abuse, and warn users of potential risk.
+Version: 1.7.0
+Author: Josh Panter
+Author URI: https://unfettered.net
+*/
 // Make sure we're in YOURLS context
 if( !defined( 'YOURLS_ABSPATH' ) ) {
 ?>
@@ -160,5 +165,6 @@ if( isset($_GET['action']) && $_GET['action'] == "autofill" ) {
 	<?php echo (isset($result) ? $result : '<p><i>Please be advised: <b>Your report will be visible to future visitors</b> of the shortlink (Reason for report) but your contact information, which we request in case additional information is required, will remain confidential.</i></p><p><a href="/">Click here</a> to return to our home page.</p><p>Thank You.</p>'); ?>
 
 	</div>
+	<?php if((yourls_is_active_plugin('httpBL/plugin.php') && yourls_get_option('httpBL_honeypot'))) print httpbl_link() . "\n"; ?>
 	</body>
 </html>
