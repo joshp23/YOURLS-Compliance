@@ -3,7 +3,7 @@
 Plugin Name: Compliance | Report Page
 Plugin URI: https://github.com/joshp23/YOURLS-Compliance
 Description: Provides a way to flag short urls for abuse, and warn users of potential risk.
-Version: 1.7.0
+Version: 1.7.1
 Author: Josh Panter
 Author URI: https://unfettered.net
 */
