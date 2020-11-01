@@ -97,7 +97,7 @@ if( isset($_GET['action']) && $_GET['action'] == "autofill" ) {
 
 				if (yourls_keyword_is_taken( $alias ) == true) {
 					global $ydb;
-					$table = "flagged";
+					$table = YOURLS_DB_PREFIX .'flagged';
 					if (version_compare(YOURLS_VERSION, '1.7.3') >= 0) {
 						$binds = array( 'alias' => $alias,
 										'reason' => $reason,
