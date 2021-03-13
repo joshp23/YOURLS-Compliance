@@ -9,10 +9,10 @@ if( !defined( 'YOURLS_ABSPATH' ) ) die();
 		<p>Don't forget to return here after submitting to check for messages!</p>
 		
 		<form method="post">
-			<table id="main_table" class="tblSorter" border="1" cellpadding="5" style="border-collapse: collapse">
+			<table id="compliance_table" border="1" cellpadding="5">
 				<thead>
 					<tr>
-						<th>Flagged Alias</th>
+						<th>Alias</th>
 						<th>Reason</th>
 						<th>Email</th>
 						<th>Time and Date of Complaint</th>
@@ -22,13 +22,13 @@ if( !defined( 'YOURLS_ABSPATH' ) ) die();
 				</thead>
 				<tbody>
 					<tr>
-						<td><input type="text" name="alias" size=8></td>
-						<td><input type="text" name="reason" size=30></td>
-						<td><input type="text" name="contact" size=20></td>
+						<td><input type="text" name="alias" size=4></td>
+						<td><input type="text" name="reason" size=23></td>
+						<td><input type="text" name="contact" size=17></td>
 						<td><input type="text" name="date" size=12 disabled></td>
-						<td><input type="text" name="date" size=3 disabled></td>
+						<td><input type="text" name="clicks" size=3 disabled></td>
 						<td colspan=3 align=right>
-							<input type=submit name="submit" value="Flag this!">
+							<input type=submit name="submit" value="Submit">
 							<input type="hidden" name="action" value="flag">
 						</td>
 					</tr>
