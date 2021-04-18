@@ -99,9 +99,9 @@ if( isset($_GET['action']) && $_GET['action'] == "autofill" ) {
 					global $ydb;
 					$table = YOURLS_DB_PREFIX .'flagged';
 					if (version_compare(YOURLS_VERSION, '1.7.3') >= 0) {
-						$binds = array( 'alias' => $alias,
-										'reason' => $reason,
-										'contact' => $contact);
+						$binds = array( 'alias' => yourls_escape($alias),
+										'reason' => yourls_escape($reason),
+										'contact' => yourls_escape($contact));
 								
 						$sql = "REPLACE INTO `$table` (keyword, reason, addr) VALUES (:alias, :reason, :contact)";
 						$insert = $ydb->fetchAffected($sql, $binds);
