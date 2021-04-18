@@ -99,14 +99,15 @@ if( isset($_GET['action']) && $_GET['action'] == "autofill" ) {
 					global $ydb;
 					$table = YOURLS_DB_PREFIX .'flagged';
 					if (version_compare(YOURLS_VERSION, '1.7.3') >= 0) {
-						$binds = array( 'alias' => yourls_escape($alias),
-										'reason' => yourls_escape($reason),
-										'contact' => yourls_escape($contact));
+						$binds = array( 'alias' => $alias,
+										'reason' => $reason,
+										'contact' => $contact);
 								
 						$sql = "REPLACE INTO `$table` (keyword, reason, addr) VALUES (:alias, :reason, :contact)";
 						$insert = $ydb->fetchAffected($sql, $binds);
 					} else {
-						$insert = $ydb->query("REPLACE INTO `$table` (keyword, reason, addr) VALUES ('$alias', '$reason', '$contact')");
+
+						$insert = $ydb->query("REPLACE INTO `$table` (keyword, reason, addr) VALUES ('{yourls_escape($alias)}', '{yourls_escape($reason)}', '{yourls_escape($contact)}')");
 					}
 					$result = "
 					<div class='alert alert-dismissible alert-success'>
