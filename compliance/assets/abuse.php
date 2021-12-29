@@ -24,9 +24,9 @@ if( !defined( 'YOURLS_ABSPATH' ) ) {
 }
 // Autofill abuse form - integration with other plugins
 if( isset($_GET['action']) && $_GET['action'] == "autofill" ) {
-	if( isset($_GET['alias'])) $alias = $_GET['alias'];
-	if( isset($_GET['reason'])) $reason = $_GET['reason'];
-	if( isset($_GET['contact'])) $contact = $_GET['contact'];
+	if( isset($_GET['alias'])) $alias = htmlspecialchars($_GET['alias']);
+	if( isset($_GET['reason'])) $reason = htmlspecialchars($_GET['reason']);
+	if( isset($_GET['contact'])) $contact = htmlspecialchars($_GET['contact']);
 }
 ?>
 <!--- In path, resume --->
@@ -54,7 +54,7 @@ if( isset($_GET['action']) && $_GET['action'] == "autofill" ) {
 	<div style='padding: 10px 50px''>
 
 	<h2>Compliance Report</h2>
-	<p>If you feel that any short URL's from this serivce have been posted to support abusive purposes such as spam, phishing, or the spread of malware, please report the URL as such using the form below.</p>
+	<p>If you feel that any short URL's from this service have been posted to support abusive purposes such as spam, phishing, or the spread of malware, please report the URL as such using the form below.</p>
 	<p><b>The offending URL will be flagged automatically, and users will be warned of a potential threat.</b></p>
 
 	<?php
@@ -63,7 +63,7 @@ if( isset($_GET['action']) && $_GET['action'] == "autofill" ) {
 		// is the botbox clear?
 		if ($_POST['botbox'] == '1') {
 			// Error... 
-			$result='<div class="alert alert-danger">You chekced the box. I told you not to check the box. Try again, or <a href="/">click here</a> to return to the home page.</div>';
+			$result='<div class="alert alert-danger">You checked the box. I told you not to check the box. Try again, or <a href="/">click here</a> to return to the home page.</div>';
 		// all clear...
 		} else {
 			// Check if alias has been entered
@@ -73,7 +73,7 @@ if( isset($_GET['action']) && $_GET['action'] == "autofill" ) {
 			} else { 
 				// or set vars and continue
 				$errAlias = null;
-				$alias = $_POST['alias'];
+				$alias = htmlspecialchars($_POST['alias']);
 					}
 
 			//Check if message has been entered...
@@ -81,7 +81,7 @@ if( isset($_GET['action']) && $_GET['action'] == "autofill" ) {
 				$errReason = '<p class="text-danger">Please tell us why we should flag this url.</p>';
 			} else { 
 				$errReason = null;
-				$reason = $_POST['reason'];
+				$reason = htmlspecialchars($_POST['reason']);
 					}
 
 			// Check if email has been entered and is valid...
@@ -89,7 +89,7 @@ if( isset($_GET['action']) && $_GET['action'] == "autofill" ) {
 				$errContact = 'This form will not submit without a valid email address.';
 			} else { 
 				$errContact = null;
-				$contact = $_POST['contact'];
+				$contact = htmlspecialchars($_POST['contact']);
 					}
 
 			// If there are no errors, submit the report
@@ -106,7 +106,8 @@ if( isset($_GET['action']) && $_GET['action'] == "autofill" ) {
 						$sql = "REPLACE INTO `$table` (keyword, reason, addr) VALUES (:alias, :reason, :contact)";
 						$insert = $ydb->fetchAffected($sql, $binds);
 					} else {
-						$insert = $ydb->query("REPLACE INTO `$table` (keyword, reason, addr) VALUES ('$alias', '$reason', '$contact')");
+
+						$insert = $ydb->query("REPLACE INTO `$table` (keyword, reason, addr) VALUES ('{yourls_escape($alias)}', '{yourls_escape($reason)}', '{yourls_escape($contact)}')");
 					}
 					$result = "
 					<div class='alert alert-dismissible alert-success'>
